@@ -1,180 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="images/icon.png" type="image/png">
-    <title>SDG's Sonic CD Fan Site</title>
+    <title>Comments Section</title>
     <style>
-        @import url("sonic_cd_menu_font/stylesheet.css");
-
-        /* Remove default body margin/padding */
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow-x: hidden; /* Disable horizontal scrolling */
-            overflow-y: auto; /* Allow vertical scrolling */
-        }
-
-        /* Hide scrollbars */
-        ::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Add background image to the body */
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: url('images/bg.png') center center / cover fixed no-repeat; /* Background setup */
-            font-family: Arial, sans-serif;
-        }
-
-        .viewport-wrapper {
-            width: 1920px;
-            height: 1080px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        h1 {
-            position: absolute;
-            top: 70px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 2vw; /* Responsive font size using viewport width */
-            max-width: 90%;
-            text-align: center;
-            font-family: "sonic cd menu font", Cambria, Hoefler Text, Liberation Serif, Times, Times New Roman, serif;
-            z-index: 2;
-            text-shadow: 
-                2px 2px 0px rgba(0, 0, 0, 1), /* Right and down shadow */
-                -2px -2px 0px rgba(0, 0, 0, 1), /* Left and up shadow */
-                2px -2px 0px rgba(0, 0, 0, 1), /* Right and up shadow */
-                -2px 6px 0px rgba(0, 6, 0, 1); /* Left and down shadow */
-            color: #fff;
-            animation: rainbow-text 5s infinite linear;
-        }
-
-        @keyframes rainbow-text {
-            0% {
-                color: red;
-            }
-            15% {
-                color: orange;
-            }
-            30% {
-                color: yellow;
-            }
-            45% {
-                color: green;
-            }
-            60% {
-                color: blue;
-            }
-            75% {
-                color: indigo;
-            }
-            90% {
-                color: violet;
-            }
-            100% {
-                color: red;
-            }
-        }
-
-        h2 {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 2vw; /* Responsive font size using viewport width */
-            color: #333;
-            max-width: 90%;
-            text-align: center;
-            font-family: "sonic cd menu font", Cambria, Hoefler Text, Liberation Serif, Times, Times New Roman, serif;
-            z-index: 0;
-        }
-
-        /* Scroll Container */
-        .scroll-container {
-            display: flex;
-            width: 100%;
-            height: 160px; /* Ensure it doesn't expand the height */
-            overflow: hidden;
-            position: absolute;
-            top: 50px; /* Adjusted position */
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        /* Image Styling */
-        .scroll-images {
-            display: flex;
-            animation: scrollImages 10s linear infinite;
-        }
-
-        .scroll-image {
-            width: 852px;
-            height: 160px;
-            flex-shrink: 0;
-        }
-
-        @keyframes scrollImages {
-            0% {
-                transform: translateX(0);
-            }
-            100% {
-                transform: translateX(-50%);
-            }
-        }
-
-        /* Button Styling */
-        .button-container {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .release-button {
-            font-size: 18px;
-            padding: 10px 120px;
-            background-color: #333;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .release-button:hover {
-            background-color: #555;
-        }
+        /* Your existing styles here */
     </style>
 </head>
 <body>
-    <div class="viewport-wrapper">
-        <h1><strong>SDG's Sonic CD&nbsp; Fan Site!</strong></h1>
-        <h2 style="top: 20%; text-shadow: 2px 6px 2px rgba(0, 6, 0, 1);">Explore, like Sonic!</h2>
-        <h2 style="top: 30%; text-shadow: 2px 6px 2px rgba(0, 6, 0, 1);">Welcome to the fan site!</h2>
-        <h2 style="top: 40%; text-shadow: 2px 6px 2px rgba(0, 6, 0, 1);">Explore the latest updates on Sonic CD.</h2>
-
-        <!-- Scroll Container with Images -->
-        <div class="scroll-container">
-            <div class="scroll-images">
-                <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
-                <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
-                <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
-                <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
-                <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
-            </div>
-        </div>
-
-        <div class="button-container">
-            <a href="releases.html" class="release-button">Go to Releases</a>
-        </div>
+    <div class="comment-form">
+        <input type="text" id="name" placeholder="Your Name" required>
+        <textarea id="comment" placeholder="Your Comment" required></textarea>
+        <button onclick="addComment()">Submit</button>
     </div>
+    <div class="comments-container" id="commentsContainer"></div>
+
+    <script type="module">
+        import { initializeApp } from "./firebase-setup.js";
+        import { getFirestore, collection, addDoc, getDocs } from "./firebase-setup.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCrxSA-Y5FjKCkULoQ3iwCiKaupZOSK9FU",
+            authDomain: "soniccdfansite.firebaseapp.com",
+            projectId: "soniccdfansite",
+            storageBucket: "soniccdfansite.firebasestorage.app",
+            messagingSenderId: "739250141699",
+            appId: "1:739250141699:web:1925788f3944b1aa58ac36",
+            measurementId: "G-EQK0WQWQ33"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function fetchComments() {
+            const querySnapshot = await getDocs(collection(db, "comments"));
+            const commentsContainer = document.getElementById('commentsContainer');
+            commentsContainer.innerHTML = '';
+            querySnapshot.forEach((doc) => {
+                const comment = doc.data();
+                const commentDiv = document.createElement('div');
+                commentDiv.classList.add('comment');
+
+                const commentHeader = document.createElement('h4');
+                commentHeader.innerText = comment.name;
+                commentDiv.appendChild(commentHeader);
+
+                const commentBody = document.createElement('p');
+                commentBody.innerText = comment.text;
+                commentDiv.appendChild(commentBody);
+
+                commentsContainer.appendChild(commentDiv);
+            });
+        }
+
+        async function addComment() {
+            const name = document.getElementById('name').value;
+            const commentText = document.getElementById('comment').value;
+
+            if (name && commentText) {
+                await addDoc(collection(db, "comments"), {
+                    name: name,
+                    text: commentText,
+                    date: new Date()
+                });
+                fetchComments();
+
+                document.getElementById('name').value = '';
+                document.getElementById('comment').value = '';
+            }
+        }
+
+        window.onload = fetchComments;
+    </script>
 </body>
 </html>
