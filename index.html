@@ -7,11 +7,18 @@
     <style>
         @import url("sonic_cd_menu_font/stylesheet.css");
 
-        /* Remove scrollbars */
+        /* Remove default body margin/padding */
         html, body {
-            overflow: hidden; /* Hide both horizontal and vertical scrollbars */
-            margin: 0; /* Remove default margin */
-            padding: 0; /* Remove default padding */
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow-x: hidden; /* Disable horizontal scrolling */
+            overflow-y: auto; /* Allow vertical scrolling */
+        }
+
+        /* Hide scrollbars */
+        ::-webkit-scrollbar {
+            display: none;
         }
 
         /* Add background image to the body */
@@ -19,75 +26,69 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-direction: column; /* Stack elements vertically */
-            height: 100vh;
-            background-color: #FFFFFF;
-            background-image: url('images/bg.png'); /* Add your background image */
-            background-size: cover; /* Ensure the background covers the whole page */
-            background-position: center center; /* Center the background image */
-            background-attachment: fixed; /* Make the background fixed while scrolling */
+            flex-direction: column;
+            min-height: 100vh;
+            background: url('images/bg.png') center center / cover fixed no-repeat; /* Background setup */
             font-family: Arial, sans-serif;
         }
 
         h1 {
             position: absolute;
             top: 10px;
-            font-size: 40px;
+            font-size: 2vw; /* Responsive font size using viewport width */
             color: #333;
-            width: 788px;
-            height: 80px;
+            max-width: 90%;
             text-align: center;
             font-family: "sonic cd menu font", Cambria, Hoefler Text, Liberation Serif, Times, Times New Roman, serif;
-            z-index: 2; /* Ensure the text appears above the images */
+            z-index: 2;
         }
 
         /* Scroll Container */
         .scroll-container {
             display: flex;
-            width: 100vw; /* Use full width of the viewport */
-            overflow: hidden; /* Hide anything that overflows the container */
+            width: 100vw;
+            overflow: hidden;
             position: absolute;
-            top: 0px; /* Adjust the vertical positioning */
+            top: 0;
             left: 0;
         }
 
         /* Image Styling */
         .scroll-images {
-            display: flex; /* Align images horizontally */
-            animation: scrollImages 10s linear infinite; /* Apply animation to the images */
+            display: flex;
+            animation: scrollImages 10s linear infinite;
         }
 
         .scroll-image {
-            width: 852px; /* Image width */
-            height: 160px; /* Image height */
-            border: 0px solid #000;
-            flex-shrink: 0; /* Prevent images from shrinking */
+            width: 852px;
+            height: 160px;
+            flex-shrink: 0;
         }
 
         @keyframes scrollImages {
             0% {
-                transform: translateX(0); /* Start at the beginning */
+                transform: translateX(0);
             }
             100% {
-                transform: translateX(-53%); /* Move left by half the total width of the images */
+                transform: translateX(-53%);
             }
         }
 
+        /* Button Styling */
         .button-container {
-            margin-right: 1030px;
-            margin-top: 1030px;
+            position: relative;
+            margin-top: 140vh;
         }
 
         .release-button {
             font-size: 18px;
-            padding: 10px 20px;
+            padding: 10px 120px;
             background-color: #333;
             color: #fff;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             text-decoration: none;
-            font-family: Arial, sans-serif;
         }
 
         .release-button:hover {
@@ -101,17 +102,16 @@
     <!-- Scroll Container with Images -->
     <div class="scroll-container">
         <div class="scroll-images">
-          <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
-          <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
-          <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
-          <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
-          <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+            <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+            <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+            <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+            <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+            <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
         </div>
     </div>
 
     <div class="button-container">
         <a href="releases.html" class="release-button">Go to Releases</a>
     </div>
-
 </body>
 </html>
