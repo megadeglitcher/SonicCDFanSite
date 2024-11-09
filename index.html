@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="images/icon.png" type="image/png">
     <title>SDG's Sonic CD Fan Site</title>
     <style>
         @import url("sonic_cd_menu_font/stylesheet.css");
@@ -41,6 +42,21 @@
             text-align: center;
             font-family: "sonic cd menu font", Cambria, Hoefler Text, Liberation Serif, Times, Times New Roman, serif;
             z-index: 2;
+			text-shadow: 
+				2px 2px 0px rgba(0, 0, 0, 1), /* Right and down shadow */
+				-2px -2px 0px rgba(0, 0, 0, 1), /* Left and up shadow */
+				2px -2px 0px rgba(0, 0, 0, 1), /* Right and up shadow */
+				-2px 6px 0px rgba(0, 6, 0, 1); /* Left and down shadow */
+        }
+
+        h2 {
+            position: relative;
+            font-size: 2vw; /* Responsive font size using viewport width */
+            color: #333;
+            max-width: 90%;
+            text-align: center;
+            font-family: "sonic cd menu font", Cambria, Hoefler Text, Liberation Serif, Times, Times New Roman, serif;
+            z-index: 0;
         }
 
         /* Scroll Container */
@@ -98,6 +114,9 @@
 </head>
 <body>
     <h1><strong>SDG's Sonic CD&nbsp; Fan Site</strong></h1>
+	<h2 style="position: relative; top: 550px; text-shadow: 2px 6px 2px rgba(0, 6, 0, 1);">Explore, like Sonic!</h2>
+<h2 style="position: relative; top: 500px; text-shadow: 2px 6px 2px rgba(0, 6, 0, 1);">Welcome to the fan site!</h2>
+<h2 style="position: relative; top: 440px; text-shadow: 2px 6px 2px rgba(0, 6, 0, 1);">Explore the latest updates on Sonic CD.</h2>
 
     <!-- Scroll Container with Images -->
     <div class="scroll-container">
@@ -110,7 +129,7 @@
         </div>
     </div>
 
-    <div class="button-container">
+<div class="button-container">
         <a href="releases.html" class="release-button">Go to Releases</a>
     </div>
 </body>
