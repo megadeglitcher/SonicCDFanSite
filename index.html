@@ -7,18 +7,11 @@
     <style>
         @import url("sonic_cd_menu_font/stylesheet.css");
 
-        /* Remove default body margin/padding */
+        /* Remove scrollbars */
         html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow-x: hidden; /* Disable horizontal scrolling */
-            overflow-y: scroll; /* Enable vertical scrolling */
-        }
-
-        /* Hide the scrollbars */
-        ::-webkit-scrollbar {
-            display: none; /* Hides the scrollbar */
+            overflow: hidden; /* Hide both horizontal and vertical scrollbars */
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
         }
 
         /* Add background image to the body */
@@ -34,7 +27,6 @@
             background-position: center center; /* Center the background image */
             background-attachment: fixed; /* Make the background fixed while scrolling */
             font-family: Arial, sans-serif;
-            overflow: auto; /* Ensure content can still scroll */
         }
 
         h1 {
