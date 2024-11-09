@@ -27,59 +27,68 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
             min-height: 100vh;
             background: url('images/bg.png') center center / cover fixed no-repeat; /* Background setup */
             font-family: Arial, sans-serif;
         }
 
-		h1 {
-			position: absolute;
-			top: 10px;
-			font-size: 2vw; /* Responsive font size using viewport width */
-			max-width: 90%;
-			text-align: center;
-			font-family: "sonic cd menu font", Cambria, Hoefler Text, Liberation Serif, Times, Times New Roman, serif;
-			z-index: 2;
-			text-shadow: 
-				2px 2px 0px rgba(0, 0, 0, 1), /* Right and down shadow */
-				-2px -2px 0px rgba(0, 0, 0, 1), /* Left and up shadow */
-				2px -2px 0px rgba(0, 0, 0, 1), /* Right and up shadow */
-				-2px 6px 0px rgba(0, 6, 0, 1); /* Left and down shadow */
-			color: #fff;
-			animation: rainbow-text 5s infinite linear;
-		}
+        .viewport-wrapper {
+            width: 1920px;
+            height: 1080px;
+            position: relative;
+            overflow: hidden;
+        }
 
-		@keyframes rainbow-text {
-			0% {
-				color: red;
-			}
-			15% {
-				color: orange;
-			}
-			30% {
-				color: yellow;
-			}
-			45% {
-				color: green;
-			}
-			60% {
-				color: blue;
-			}
-			75% {
-				color: indigo;
-			}
-			90% {
-				color: violet;
-			}
-			100% {
-				color: red;
-			}
-		}
+        h1 {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2vw; /* Responsive font size using viewport width */
+            max-width: 90%;
+            text-align: center;
+            font-family: "sonic cd menu font", Cambria, Hoefler Text, Liberation Serif, Times, Times New Roman, serif;
+            z-index: 2;
+            text-shadow: 
+                2px 2px 0px rgba(0, 0, 0, 1), /* Right and down shadow */
+                -2px -2px 0px rgba(0, 0, 0, 1), /* Left and up shadow */
+                2px -2px 0px rgba(0, 0, 0, 1), /* Right and up shadow */
+                -2px 6px 0px rgba(0, 6, 0, 1); /* Left and down shadow */
+            color: #fff;
+            animation: rainbow-text 5s infinite linear;
+        }
 
+        @keyframes rainbow-text {
+            0% {
+                color: red;
+            }
+            15% {
+                color: orange;
+            }
+            30% {
+                color: yellow;
+            }
+            45% {
+                color: green;
+            }
+            60% {
+                color: blue;
+            }
+            75% {
+                color: indigo;
+            }
+            90% {
+                color: violet;
+            }
+            100% {
+                color: red;
+            }
+        }
 
         h2 {
-            position: relative;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
             font-size: 2vw; /* Responsive font size using viewport width */
             color: #333;
             max-width: 90%;
@@ -91,11 +100,13 @@
         /* Scroll Container */
         .scroll-container {
             display: flex;
-            width: 100vw;
+            width: 100%;
+            height: 160px; /* Ensure it doesn't expand the height */
             overflow: hidden;
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 50px; /* Adjusted position */
+            left: 50%;
+            transform: translateX(-50%);
         }
 
         /* Image Styling */
@@ -115,14 +126,16 @@
                 transform: translateX(0);
             }
             100% {
-                transform: translateX(-53%);
+                transform: translateX(-50%);
             }
         }
 
         /* Button Styling */
         .button-container {
-            position: relative;
-            margin-top: 140vh;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
         }
 
         .release-button {
@@ -142,24 +155,26 @@
     </style>
 </head>
 <body>
-    <h1><strong>SDG's Sonic CD&nbsp; Fan Site</strong></h1>
-	<h2 style="position: relative; top: 550px; text-shadow: 2px 6px 2px rgba(0, 6, 0, 1);">Explore, like Sonic!</h2>
-<h2 style="position: relative; top: 500px; text-shadow: 2px 6px 2px rgba(0, 6, 0, 1);">Welcome to the fan site!</h2>
-<h2 style="position: relative; top: 440px; text-shadow: 2px 6px 2px rgba(0, 6, 0, 1);">Explore the latest updates on Sonic CD.</h2>
+    <div class="viewport-wrapper">
+        <h1><strong>SDG's Sonic CD&nbsp; Fan Site</strong></h1>
+        <h2 style="top: 20%; text-shadow: 2px 6px 2px rgba(0, 6, 0, 1);">Explore, like Sonic!</h2>
+        <h2 style="top: 30%; text-shadow: 2px 6px 2px rgba(0, 6, 0, 1);">Welcome to the fan site!</h2>
+        <h2 style="top: 40%; text-shadow: 2px 6px 2px rgba(0, 6, 0, 1);">Explore the latest updates on Sonic CD.</h2>
 
-    <!-- Scroll Container with Images -->
-    <div class="scroll-container">
-        <div class="scroll-images">
-            <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
-            <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
-            <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
-            <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
-            <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+        <!-- Scroll Container with Images -->
+        <div class="scroll-container">
+            <div class="scroll-images">
+                <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+                <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+                <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+                <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+                <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+            </div>
         </div>
-    </div>
 
-<div class="button-container">
-        <a href="releases.html" class="release-button">Go to Releases</a>
+        <div class="button-container">
+            <a href="releases.html" class="release-button">Go to Releases</a>
+        </div>
     </div>
 </body>
 </html>
