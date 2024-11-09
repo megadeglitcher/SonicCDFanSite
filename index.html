@@ -7,6 +7,21 @@
     <style>
         @import url("sonic_cd_menu_font/stylesheet.css");
 
+        /* Remove default body margin/padding */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow-x: hidden; /* Disable horizontal scrolling */
+            overflow-y: scroll; /* Enable vertical scrolling */
+        }
+
+        /* Hide the scrollbars */
+        ::-webkit-scrollbar {
+            display: none; /* Hides the scrollbar */
+        }
+
+        /* Add background image to the body */
         body {
             display: flex;
             justify-content: center;
@@ -14,32 +29,61 @@
             flex-direction: column; /* Stack elements vertically */
             height: 100vh;
             background-color: #FFFFFF;
+            background-image: url('images/bg.png'); /* Add your background image */
+            background-size: cover; /* Ensure the background covers the whole page */
+            background-position: center center; /* Center the background image */
+            background-attachment: fixed; /* Make the background fixed while scrolling */
             font-family: Arial, sans-serif;
-            margin: 0;
-        }
-
-        img {
-            position: absolute;
-            top: 100px;
-            max-width: 100%;
-            height: 141px;
-            border: 2px solid #000000;
-            width: 153px;
+            overflow: auto; /* Ensure content can still scroll */
         }
 
         h1 {
             position: absolute;
-            top: -10px;
+            top: 10px;
             font-size: 40px;
             color: #333;
             width: 788px;
             height: 80px;
             text-align: center;
             font-family: "sonic cd menu font", Cambria, Hoefler Text, Liberation Serif, Times, Times New Roman, serif;
+            z-index: 2; /* Ensure the text appears above the images */
+        }
+
+        /* Scroll Container */
+        .scroll-container {
+            display: flex;
+            width: 100vw; /* Use full width of the viewport */
+            overflow: hidden; /* Hide anything that overflows the container */
+            position: absolute;
+            top: 0px; /* Adjust the vertical positioning */
+            left: 0;
+        }
+
+        /* Image Styling */
+        .scroll-images {
+            display: flex; /* Align images horizontally */
+            animation: scrollImages 10s linear infinite; /* Apply animation to the images */
+        }
+
+        .scroll-image {
+            width: 852px; /* Image width */
+            height: 160px; /* Image height */
+            border: 0px solid #000;
+            flex-shrink: 0; /* Prevent images from shrinking */
+        }
+
+        @keyframes scrollImages {
+            0% {
+                transform: translateX(0); /* Start at the beginning */
+            }
+            100% {
+                transform: translateX(-53%); /* Move left by half the total width of the images */
+            }
         }
 
         .button-container {
-            margin-top: 30px;
+            margin-right: 1030px;
+            margin-top: 1030px;
         }
 
         .release-button {
@@ -60,11 +104,22 @@
     </style>
 </head>
 <body>
-    <h1><strong>SDG's Sonic CD Fan Site</strong></h1>
-    <img src="images/download.jpg" alt="Sonic CD Image">
-    
+    <h1><strong>SDG's Sonic CD&nbsp; Fan Site</strong></h1>
+
+    <!-- Scroll Container with Images -->
+    <div class="scroll-container">
+        <div class="scroll-images">
+          <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+          <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+          <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+          <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+          <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+        </div>
+    </div>
+
     <div class="button-container">
         <a href="releases.html" class="release-button">Go to Releases</a>
     </div>
+
 </body>
 </html>
