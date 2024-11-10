@@ -174,3 +174,7 @@ window.loadComments = function() {
     });
   });
 };
+
+// Ensure comments load immediately when the page first appears
+document.addEventListener('DOMContentLoaded', loadComments);
+
