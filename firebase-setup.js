@@ -109,24 +109,23 @@ window.loadComments = function() {
     snapshot.forEach((doc) => {
       const commentData = doc.data();
       const commentElement = document.createElement('div');
-
+      const commentText = document.createElement('p');
+      const commentTimestamp = document.createElement('p');
+      
+      commentText.textContent = `${commentData.name}: ${commentData.comment}`;
+      
       // Convert the timestamp to the user's local time
       const createdAt = commentData.createdAt.toDate();
       const localDateString = createdAt.toLocaleDateString('en-GB');
       const localTimeString = createdAt.toLocaleTimeString('en-GB');
+      
+      commentTimestamp.textContent = `${localDateString} ~ ${localTimeString}`;
+      commentTimestamp.style.fontSize = 'small';
+      commentTimestamp.style.fontStyle = 'italic';
+      commentTimestamp.style.color = 'rgba(0, 0, 0, 0.6)';
 
-      const timestampElement = document.createElement('p');
-      timestampElement.style.fontSize = '0.8em';
-      timestampElement.style.color = 'rgba(0, 0, 0, 0.6)';
-      timestampElement.style.fontStyle = 'italic';
-      timestampElement.textContent = `${localDateString} ~ ${localTimeString}`;
-
-      const messageElement = document.createElement('p');
-      messageElement.textContent = `${commentData.name}: ${commentData.comment}`;
-
-      commentElement.appendChild(messageElement);
-      commentElement.appendChild(timestampElement);
-
+      commentElement.appendChild(commentText);
+      commentElement.appendChild(commentTimestamp);
       commentsContainer.appendChild(commentElement);
     });
   });
@@ -170,4 +169,6 @@ document.getElementById('register-password').addEventListener('keydown', functio
   }
 });
 
-window.onload = function
+window.onload = function() {
+  loadComments();
+};
