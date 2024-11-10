@@ -1,7 +1,8 @@
+// Import necessary Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-// Your Firebase configuration
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCrxSA-Y5FjKCkULoQ3iwCiKaupZOSK9FU",
   authDomain: "soniccdfansite.firebaseapp.com",
@@ -12,26 +13,23 @@ const firebaseConfig = {
   measurementId: "G-EQK0WQWQ33"
 };
 
-// Initialize Firebase
+// Initialize Firebase and Firestore
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Function to update the title and display user profile
+// Function to update title and display user profile
 async function displayUserProfile() {
-	<head>
-		<title>User Profile - {username}</title> {/* Set dynamic title */}
-	</head>
-  // Extract username from the URL hash (e.g., #/User/SDG)
   const hash = window.location.hash;
-  const parts = hash.split('/');  // Split the hash string by "/"
-  
-  if (parts.length < 3 || parts[1] !== 'User') {
+  const parts = hash.split('/');
+
+  // Validate the URL hash format
+  if (parts.length < 3 || parts[1].toLowerCase() !== 'user') {
     document.getElementById('error-message').textContent = 'Invalid URL format. Expected: /user-profile.html#/User/{username}';
     return;
   }
 
   const username = parts[2];  // Extract username (the part after "/User/")
-
+  
   if (!username) {
     document.getElementById('error-message').textContent = 'Username is required in the URL.';
     return;
@@ -40,22 +38,25 @@ async function displayUserProfile() {
   // Set the page title dynamically
   document.title = `User Profile - ${username}`;
 
-  // Fetch user data from Firestore
   try {
+    // Fetch user data from Firestore
     const userDoc = await getDoc(doc(db, "users", username));
+    
     if (!userDoc.exists()) {
       document.getElementById('error-message').textContent = `User "${username}" not found.`;
       return;
     }
 
+    // Display user data
     const userData = userDoc.data();
     document.getElementById('username').textContent = userData.username;
     document.getElementById('created-at').textContent = new Date(userData.createdAt).toLocaleString();
 
   } catch (e) {
     document.getElementById('error-message').textContent = 'Error fetching user data.';
+    console.error('Firestore fetch error:', e);
   }
 }
 
-// Call the function to update title and load user profile when page loads
+// Call the function when the page loads
 window.onload = displayUserProfile;
