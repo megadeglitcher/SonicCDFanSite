@@ -100,9 +100,32 @@ async function loginUser(username, password) {
   }
 }
 
-window.registerUser = registerUser;
-window.loginUser = loginUser;
+// Function to log off
+function logOff() {
+  eraseCookie("loggedInUser");  // Clear the logged-in user cookie
+  loggedInUser = null;  // Clear the logged-in user variable
+  displayMessage('login-error-message', 'You have been logged out.', false);  // Display logged-out message
 
+  // Optionally, you can also reset any UI elements or fields as needed
+  document.getElementById('login-username').value = '';
+  document.getElementById('login-password').value = '';
+
+  // Hide the comment section when logged out
+  document.getElementById('comment-section').style.display = 'none';
+}
+
+// Check if the user is logged in
+function checkLoginState() {
+  if (loggedInUser) {
+    document.getElementById('comment-section').style.display = 'block';  // Show comment section
+    document.getElementById('login-error-message').textContent = 'Welcome back, ' + loggedInUser + '!';
+  } else {
+    document.getElementById('comment-section').style.display = 'none';  // Hide comment section
+    document.getElementById('login-error-message').textContent = '';
+  }
+}
+
+// Submit comment function
 window.submitComment = async function() {
   if (!loggedInUser) {
     alert('You need to be logged in to do that.');
@@ -129,6 +152,7 @@ window.submitComment = async function() {
   }
 };
 
+// Load comments function
 function loadComments() {
   const commentsRef = collection(db, "comments");
   const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
@@ -175,10 +199,7 @@ function loadComments() {
   });
 }
 
-window.onload = function() {
-  loadComments();  // Load comments on page load
-};
-
+// Call this function to ensure the comment section is shown only if the user is logged in
 function rainbowText(text, reverse = false) {
   const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
   if (reverse) colors.reverse();
@@ -197,3 +218,9 @@ function applyOutlineStyle(element) {
   element.style.webkitTextStroke = '0.5px black'; // Black outline
   element.style.textFillColor = 'white'; // Text color
 }
+
+// Update the checkLoginState function to run when the page loads
+window.onload = function() {
+  checkLoginState();  // Check login state on page load
+  loadComments();  // Load comments on page load
+};
