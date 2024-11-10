@@ -157,19 +157,6 @@ window.loadComments = function() {
         });
       }
 
-      // Apply reverse rainbow text color for SDG's username
-      if (commentData.name === 'SDG') {
-        const reverseRainbowColors = ['violet', 'indigo', 'blue', 'green', 'yellow', 'orange', 'red'];
-        const nameSpan = document.createElement('span');
-        nameSpan.style.color = reverseRainbowColors[0];
-        nameSpan.textContent = commentData.name;
-        commentText.innerHTML = '';
-        commentText.appendChild(nameSpan);
-        commentText.appendChild(document.createTextNode(`: ${commentData.comment}`));
-      } else {
-        commentText.textContent = `${commentData.name}: `;
-      }
-
       commentTimestamp.textContent = formatTimestamp(commentData.createdAt);
       commentTimestamp.style.fontSize = 'small';
       commentTimestamp.style.fontStyle = 'italic';
