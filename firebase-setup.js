@@ -1,6 +1,6 @@
 // Import the necessary Firebase functions
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, setDoc, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Your Firebase configuration
 const firebaseConfig = {
@@ -105,8 +105,36 @@ async function loginUser(username, password) {
   }
 }
 
+async function changePassword(username, currentPassword, newPassword) {
+  username = username.trim();
+  if (!username || !currentPassword || !newPassword) {
+    displayMessage('change-password-error-message', 'All fields are required.');
+    return;
+  }
+
+  try {
+    const userDoc = await getDoc(doc(db, "users", username));
+    if (!userDoc.exists()) {
+      displayMessage('change-password-error-message', 'Username does not exist!');
+      return;
+    }
+    const userData = userDoc.data();
+    if (userData.password === currentPassword) {
+      await updateDoc(doc(db, "users", username), {
+        password: newPassword
+      });
+      displayMessage('change-password-error-message', 'Password updated successfully!', false);
+    } else {
+      displayMessage('change-password-error-message', 'Current password is incorrect!');
+    }
+  } catch (e) {
+    displayMessage('change-password-error-message', 'Error changing password.');
+  }
+}
+
 window.registerUser = registerUser;
 window.loginUser = loginUser;
+window.changePassword = changePassword;
 
 window.submitComment = async function() {
   if (!loggedInUser) {
