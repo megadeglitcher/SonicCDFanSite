@@ -1,19 +1,172 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Comment Section!</title>
-  <!-- Link to your JavaScript file -->
-  <script type="module" src="firebase-setup.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="images/icon.png" type="image/png">
+    <title>SDG's Sonic CD Fan Site</title>
+    <style>
+        @import url("sonic_cd_menu_font/stylesheet.css");
+
+        /* Remove default body margin/padding */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow-x: hidden; /* Disable horizontal scrolling */
+            overflow-y: auto; /* Allow vertical scrolling */
+        }
+
+        /* Hide scrollbars */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Add background image to the body */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            background: url('images/bg.png') center center / cover fixed no-repeat; /* Background setup */
+            font-family: Arial, sans-serif;
+        }
+
+        .viewport-wrapper {
+            width: 1920px;
+            height: 1080px;
+            position: relative;
+            overflow: hidden;
+        }
+		h1 {
+			position: absolute;
+			top: 10px;
+			font-size: 2vw; /* Responsive font size using viewport width */
+			max-width: 90%;
+			text-align: center;
+			font-family: "sonic cd menu font", Cambria, Hoefler Text, Liberation Serif, Times, Times New Roman, serif;
+			z-index: 2;
+			text-shadow: 
+				2px 2px 0px rgba(0, 0, 0, 1), /* Right and down shadow */
+				-2px -2px 0px rgba(0, 0, 0, 1), /* Left and up shadow */
+				2px -2px 0px rgba(0, 0, 0, 1), /* Right and up shadow */
+				-2px 6px 0px rgba(0, 6, 0, 1); /* Left and down shadow */
+			color: #fff;
+			animation: rainbow-text 5s infinite linear;
+		}
+
+		@keyframes rainbow-text {
+			0% {
+				color: red;
+			}
+			15% {
+				color: orange;
+			}
+			30% {
+				color: yellow;
+			}
+			45% {
+				color: green;
+			}
+			60% {
+				color: blue;
+			}
+			75% {
+				color: indigo;
+			}
+			90% {
+				color: violet;
+			}
+			100% {
+				color: red;
+			}
+		}
+
+
+        h2 {
+            position: relative;
+            font-size: 2vw; /* Responsive font size using viewport width */
+            color: #333;
+            max-width: 90%;
+            text-align: center;
+            font-family: "sonic cd menu font", Cambria, Hoefler Text, Liberation Serif, Times, Times New Roman, serif;
+            z-index: 0;
+        }
+
+        /* Scroll Container */
+        .scroll-container {
+            display: flex;
+            width: 100vw;
+            overflow: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        /* Image Styling */
+        .scroll-images {
+            display: flex;
+            animation: scrollImages 10s linear infinite;
+        }
+
+        .scroll-image {
+            width: 852px;
+            height: 160px;
+            flex-shrink: 0;
+        }
+
+        @keyframes scrollImages {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-53%);
+            }
+        }
+
+        /* Button Styling */
+        .button-container {
+            position: relative;
+            margin-top: 140vh;
+        }
+
+        .release-button {
+            font-size: 18px;
+            padding: 10px 120px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .release-button:hover {
+            background-color: #555;
+        }
+    </style>
 </head>
 <body>
-  <h1>Comment Section!</h1>
-  <div>
-    <input type="text" id="name" placeholder="Name">
-    <textarea id="comment" placeholder="Comment"></textarea>
-    <button onclick="submitComment()">Submit</button>
-  </div>
-  <div id="comments-container">
-    <!-- Comments will be loaded here -->
-  </div>
+    <h1><strong>SDG's Sonic CD&nbsp; Fan Site</strong></h1>
+	<h2 style="position: relative; top: 550px; text-shadow: 2px 6px 2px rgba(0, 6, 0, 1);">Explore, like Sonic!</h2>
+	<h2 style="position: relative; top: 500px; text-shadow: 2px 6px 2px rgba(0, 6, 0, 1);">Welcome to the fan site!</h2>
+	<h2 style="position: relative; top: 440px; text-shadow: 2px 6px 2px rgba(0, 6, 0, 1);">Explore the latest updates on Sonic CD.</h2>
+
+    <!-- Scroll Container with Images -->
+
+    <div class="scroll-container">
+        <div class="scroll-images">
+            <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+            <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+            <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+            <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+            <img src="images/scrollthing.png" class="scroll-image" alt="Sonic CD Image">
+        </div>
+    </div>
+
+<div class="button-container">
+        <a href="releases.html" class="release-button">Go to Releases</a>
+</div>
 </body>
 </html>
