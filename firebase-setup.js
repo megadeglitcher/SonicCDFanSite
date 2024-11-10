@@ -86,7 +86,6 @@ window.submitComment = async function() {
     return;
   }
 
-  const formattedComment = comment.replace(/\n/g, '\\n');
   const createdAt = new Date();
   const datePart = createdAt.toLocaleDateString('en-GB').replaceAll('/', '');
   const timePart = createdAt.toLocaleTimeString('en-GB').replaceAll(':', '');
@@ -95,7 +94,7 @@ window.submitComment = async function() {
   try {
     const docRef = await addDoc(collection(db, "comments"), {
       name: loggedInUser,
-      comment: formattedComment,
+      comment: comment,
       createdAt: timestamp
     });
     console.log("Document written with ID: ", docRef.id);
@@ -126,14 +125,18 @@ window.loadComments = function() {
       const commentText = document.createElement('p');
       const commentTimestamp = document.createElement('p');
 
-      commentText.innerHTML = `${commentData.name}: <br/> ${commentData.comment.replace(/\\n/g, '<br/>')}`;
-      commentText.style.marginBottom = '0px';
+      const commentParts = commentData.comment.split('\n').map(part => document.createTextNode(part));
+      commentText.textContent = `${commentData.name}: `;
+      commentParts.forEach(part => {
+        commentText.appendChild(part);
+        commentText.appendChild(document.createElement('br'));
+      });
 
       commentTimestamp.textContent = formatTimestamp(commentData.createdAt);
       commentTimestamp.style.fontSize = 'small';
       commentTimestamp.style.fontStyle = 'italic';
       commentTimestamp.style.color = 'rgba(0, 0, 0, 0.6)';
-      commentTimestamp.style.marginTop = '-15px';
+      commentTimestamp.style.marginTop = '0px';
 
       commentElement.appendChild(commentText);
       commentElement.appendChild(commentTimestamp);
@@ -143,10 +146,10 @@ window.loadComments = function() {
 };
 
 document.getElementById('comment').addEventListener('keydown', function(event) {
-  if (event.key === 'Enter' && !event.altKey) {
+  if (event.key === 'Enter' && !event.altKey && !event.ctrlKey) {
     event.preventDefault();
     submitComment();
-  } else if (event.key === 'Enter' && event.altKey) {
+  } else if ((event.key === 'Enter' && event.altKey) || (event.key === 'Enter' && event.ctrlKey)) {
     event.preventDefault();
     this.value += '\n';
   }
