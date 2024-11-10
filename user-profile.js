@@ -18,6 +18,9 @@ const db = getFirestore(app);
 
 // Function to update the title and display user profile
 async function displayUserProfile() {
+	<head>
+		<title>User Profile - {username}</title> {/* Set dynamic title */}
+	</head>
   // Extract username from the URL hash (e.g., #/User/SDG)
   const hash = window.location.hash;
   const parts = hash.split('/');  // Split the hash string by "/"
