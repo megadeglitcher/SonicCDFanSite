@@ -18,9 +18,9 @@ const db = getFirestore(app);
 
 // Function to display user profile
 async function displayUserProfile() {
-  // Extract the username from the URL (e.g., https://soniccd.vercel.app/user/SDG)
-  const urlParts = window.location.pathname.split('/');
-  const username = urlParts[urlParts.length - 1];  // The username is the last part of the URL
+  // Extract the username from the URL hash (e.g., #/User/SDG)
+  const hash = window.location.hash;
+  const username = hash.split('/')[2];  // Get the username part of the hash (after "/User/")
 
   if (!username) {
     document.getElementById('error-message').textContent = 'Invalid URL. Username is required.';
