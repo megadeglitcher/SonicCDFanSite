@@ -108,7 +108,7 @@ window.submitComment = async function() {
     });
     console.log("Document written with ID: ", docRef.id);
     document.getElementById('comment').value = '';
-    loadComments();
+    loadComments();  // Load comments after submitting
   } catch (e) {
     console.error("Error adding document: ", e);
   }
@@ -137,7 +137,7 @@ window.loadComments = function() {
   const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
   onSnapshot(commentsQuery, (snapshot) => {
     const commentsContainer = document.getElementById('comments-container');
-    commentsContainer.innerHTML = '';
+    commentsContainer.innerHTML = '';  // Clear previous comments
     snapshot.forEach((doc) => {
       const commentData = doc.data();
       const commentElement = document.createElement('div');
@@ -155,6 +155,9 @@ window.loadComments = function() {
           commentText.appendChild(part);
           commentText.appendChild(document.createElement('br'));
         });
+
+        // Add a black outline around the comment text
+        commentText.style.textShadow = '2px 2px 0px black';
       } else {
         // Regular style for other users
         commentText.textContent = `${commentData.name}: ${commentData.comment}`;
@@ -170,7 +173,28 @@ window.loadComments = function() {
       // Append elements to the comment container
       commentElement.appendChild(commentText);
       commentElement.appendChild(commentTimestamp);
-      commentsContainer.prepend(commentElement);  // Use prepend to place newest comments at the top
+      commentsContainer.appendChild(commentElement);  // Append to show newest comments at the bottom
     });
   });
 };
+
+// Ensure comments load immediately when the page loads
+window.onload = function() {
+  loadComments();
+};
+
+document.getElementById('comment').addEventListener('keydown', function(event) {
+  if (event.key === 'Enter' && !event.altKey && !event.ctrlKey) {
+    event.preventDefault();
+    submitComment();
+  } else if ((event.key === 'Enter' && event.altKey) || (event.key === 'Enter' && event.ctrlKey)) {
+    event.preventDefault();
+    this.value += '\n';
+  }
+});
+
+document.getElementById('login-username').addEventListener('keydown', function(event) {
+  if (event.key === 'Enter') {
+    loginUser(document.getElementById('login-username').value, document.getElementById('login-password').value);
+  }
+});
