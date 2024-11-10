@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -86,11 +86,16 @@ window.submitComment = async function() {
     return;
   }
 
+  const createdAt = new Date();
+  const datePart = createdAt.toLocaleDateString('en-GB').replaceAll('/', '');
+  const timePart = createdAt.toLocaleTimeString('en-GB').replaceAll(':', '');
+  const timestamp = datePart + timePart;
+
   try {
     const docRef = await addDoc(collection(db, "comments"), {
       name: loggedInUser,
       comment: comment,
-      createdAt: serverTimestamp()
+      createdAt: timestamp
     });
     console.log("Document written with ID: ", docRef.id);
     document.getElementById('comment').value = '';
@@ -99,6 +104,14 @@ window.submitComment = async function() {
     console.error("Error adding document: ", e);
   }
 };
+
+function formatTimestamp(timestamp) {
+  const datePart = timestamp.slice(0, 8);
+  const timePart = timestamp.slice(8, 14);
+  const dateFormatted = `${datePart.slice(0, 2)}/${datePart.slice(2, 4)}/${datePart.slice(4, 8)}`;
+  const timeFormatted = `${timePart.slice(0, 2)}:${timePart.slice(2, 4)}:${timePart.slice(4, 6)}`;
+  return `${dateFormatted} ~ ${timeFormatted}`;
+}
 
 window.loadComments = function() {
   const commentsRef = collection(db, "comments");
@@ -111,15 +124,9 @@ window.loadComments = function() {
       const commentElement = document.createElement('div');
       const commentText = document.createElement('p');
       const commentTimestamp = document.createElement('p');
-      
+
       commentText.textContent = `${commentData.name}: ${commentData.comment}`;
-      
-      // Convert the timestamp to the user's local time
-      const createdAt = commentData.createdAt.toDate();
-      const localDateString = createdAt.toLocaleDateString('en-GB');
-      const localTimeString = createdAt.toLocaleTimeString('en-GB');
-      
-      commentTimestamp.textContent = `${localDateString} ~ ${localTimeString}`;
+      commentTimestamp.textContent = formatTimestamp(commentData.createdAt);
       commentTimestamp.style.fontSize = 'small';
       commentTimestamp.style.fontStyle = 'italic';
       commentTimestamp.style.color = 'rgba(0, 0, 0, 0.6)';
