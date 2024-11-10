@@ -86,6 +86,7 @@ window.submitComment = async function() {
     return;
   }
 
+  const formattedComment = comment.replace(/\n/g, '\\n');
   const createdAt = new Date();
   const datePart = createdAt.toLocaleDateString('en-GB').replaceAll('/', '');
   const timePart = createdAt.toLocaleTimeString('en-GB').replaceAll(':', '');
@@ -94,7 +95,7 @@ window.submitComment = async function() {
   try {
     const docRef = await addDoc(collection(db, "comments"), {
       name: loggedInUser,
-      comment: comment,
+      comment: formattedComment,
       createdAt: timestamp
     });
     console.log("Document written with ID: ", docRef.id);
@@ -125,12 +126,14 @@ window.loadComments = function() {
       const commentText = document.createElement('p');
       const commentTimestamp = document.createElement('p');
 
-      commentText.textContent = `${commentData.name}: ${commentData.comment}`;
+      commentText.innerHTML = `${commentData.name}: <br/> ${commentData.comment.replace(/\\n/g, '<br/>')}`;
+      commentText.style.marginBottom = '0px';
+
       commentTimestamp.textContent = formatTimestamp(commentData.createdAt);
       commentTimestamp.style.fontSize = 'small';
       commentTimestamp.style.fontStyle = 'italic';
       commentTimestamp.style.color = 'rgba(0, 0, 0, 0.6)';
-      commentTimestamp.style.marginTop = '-15px';  // Adjust the margin to bring it closer
+      commentTimestamp.style.marginTop = '-15px';
 
       commentElement.appendChild(commentText);
       commentElement.appendChild(commentTimestamp);
