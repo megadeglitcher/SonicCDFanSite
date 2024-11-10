@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -23,12 +24,21 @@
     <p id="login-error-message" style="color: red;"></p>
   </div>
 
-  <h1>Comment Section</h1>
+  <h1>Comment Section!</h1>
   <div>
     <textarea id="comment" placeholder="Write your comment here"></textarea>
     <button onclick="submitComment()">Submit</button>
   </div>
   <button onclick="logOff()">Log Off</button>
+  
+  <div>
+    <h2>Change Password</h2>
+    <input type="text" id="change-username" placeholder="Username">
+    <input type="password" id="current-password" placeholder="Current Password">
+    <input type="password" id="new-password" placeholder="New Password">
+    <button onclick="changePassword(document.getElementById('change-username').value, document.getElementById('current-password').value, document.getElementById('new-password').value)">Change Password</button>
+    <p id="change-password-error-message" style="color: red;"></p>
+  </div>
 
   <div id="comments-container">
     <!-- Comments will be loaded here -->

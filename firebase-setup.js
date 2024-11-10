@@ -211,6 +211,37 @@ function rainbowText(text, reverse = false) {
   }
   return span;
 }
+// Change password function
+window.changePassword = async function(username, currentPassword, newPassword) {
+  username = username.trim();
+  currentPassword = currentPassword.trim();
+  newPassword = newPassword.trim();
+
+  if (!username || !currentPassword || !newPassword) {
+    alert('All fields are required.');
+    return;
+  }
+
+  try {
+    const userDoc = await getDoc(doc(db, "users", username));
+    if (!userDoc.exists()) {
+      alert('Username does not exist!');
+      return;
+    }
+
+    const userData = userDoc.data();
+    if (userData.password !== currentPassword) {
+      alert('Current password is incorrect!');
+      return;
+    }
+
+    // Update password
+    await setDoc(doc(db, "users", username), { ...userData, password: newPassword });
+    alert('Password changed successfully!');
+  } catch (e) {
+    alert('Error changing password.');
+  }
+};
 
 function applyOutlineStyle(element) {
   // Apply webkit text stroke (real outline effect)
