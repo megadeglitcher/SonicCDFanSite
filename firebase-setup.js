@@ -89,7 +89,7 @@ async function loginUser(username, password) {
     const userData = userDoc.data();
     if (userData.password === password) {
       loggedInUser = username;
-      setCookie("loggedInUser", username, 7);  // Set cookie for 7 days
+      setCookie("loggedInUser", username, 7);  // Set cookie for 7 days only during login
       displayMessage('login-error-message', 'User logged in successfully!', false);
       loadComments();  // Load comments after login
     } else {
@@ -141,9 +141,33 @@ function loadComments() {
       const commentText = document.createElement('p');
       const commentTimestamp = document.createElement('p');
 
-      commentText.textContent = `${commentData.name}: ${commentData.comment}`;
-      commentTimestamp.textContent = new Date(commentData.createdAt).toLocaleString();
+      // Check if the comment is from the user "SDG"
+      if (commentData.name === "SDG") {
+        // Apply reverse rainbow effect on username
+        commentText.appendChild(rainbowText(`${commentData.name}: `, true));
+        
+        // Apply rainbow effect to the comment text
+        const commentParts = commentData.comment.split('\n').map(part => rainbowText(part));
+        commentParts.forEach(part => {
+          commentText.appendChild(part);
+          commentText.appendChild(document.createElement('br'));
+        });
 
+        // Apply outline effect to SDG comment text
+        applyOutlineStyle(commentText);  // Add black outline
+      } else {
+        // Regular style for other users
+        commentText.textContent = `${commentData.name}: ${commentData.comment}`;
+      }
+
+      // Timestamp formatting
+      commentTimestamp.textContent = new Date(commentData.createdAt).toLocaleString();
+      commentTimestamp.style.fontSize = 'small';
+      commentTimestamp.style.fontStyle = 'italic';
+      commentTimestamp.style.color = 'rgba(0, 0, 0, 0.6)';
+      commentTimestamp.style.marginTop = '-10px';
+
+      // Append elements to the comment container
       commentElement.appendChild(commentText);
       commentElement.appendChild(commentTimestamp);
       commentsContainer.appendChild(commentElement);
@@ -154,3 +178,22 @@ function loadComments() {
 window.onload = function() {
   loadComments();  // Load comments on page load
 };
+
+function rainbowText(text, reverse = false) {
+  const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
+  if (reverse) colors.reverse();
+  const span = document.createElement('span');
+  for (let i = 0; i < text.length; i++) {
+    const charSpan = document.createElement('span');
+    charSpan.style.color = colors[i % colors.length];
+    charSpan.textContent = text[i];
+    span.appendChild(charSpan);
+  }
+  return span;
+}
+
+function applyOutlineStyle(element) {
+  // Apply webkit text stroke (real outline effect)
+  element.style.webkitTextStroke = '0.5px black'; // Black outline
+  element.style.textFillColor = 'white'; // Text color
+}
