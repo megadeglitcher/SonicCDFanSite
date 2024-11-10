@@ -23,53 +23,13 @@
     <p id="login-error-message" style="color: red;"></p>
   </div>
 
-  <h1>Comment Section</h1>
+  <h1>Comment Section!</h1>
   <div>
     <textarea id="comment" placeholder="Write your comment here"></textarea>
     <button onclick="submitComment()">Submit</button>
   </div>
+  <button onclick="logOff()">Log Off</button>
 
-  <script type="module" src="firebase-setup.js"></script>
-  
-    <script type="module">
-        // Import Firebase SDK
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyCrxSA-Y5FjKCkULoQ3iwCiKaupZOSK9FU",
-            authDomain: "soniccdfansite.firebaseapp.com",
-            projectId: "soniccdfansite",
-            storageBucket: "soniccdfansite.firebasestorage.app",
-            messagingSenderId: "739250141699",
-            appId: "1:739250141699:web:1925788f3944b1aa58ac36",
-            measurementId: "G-EQK0WQWQ33"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // Utility functions to handle cookies
-        function getCookie(name) {
-            const nameEQ = name + "=";
-            const ca = document.cookie.split(';');
-            for (let i = 0; i < ca.length; i++) {
-                let c = ca[i].trim();
-                if (c.indexOf(nameEQ) === 0) {
-                    return c.substring(nameEQ.length, c.length);
-                }
-            }
-            return null;
-        }
-
-		const loggedInUser = getCookie("loggedInUser");
-
-		if (loggedInUser) {
-			<button onclick="logOff()">Log Off</button>
-		}
-    </script>
   <div id="comments-container">
     <!-- Comments will be loaded here -->
   </div>
