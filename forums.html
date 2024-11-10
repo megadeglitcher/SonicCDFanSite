@@ -1,7 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login/Register and Comment Section</title>
+  <!-- Ensure the JS file is included at the end of the body so that all HTML elements are loaded first -->
   <script type="module" src="firebase-setup.js"></script>
 </head>
 <body>
@@ -32,7 +35,7 @@
     <p id="change-password-error-message" style="color: red;"></p>
   </div>
 
-  <h1>Comment Section</h1>
+  <h1>Comment Section!</h1>
   <div id="login-section">
     <textarea id="comment" placeholder="Write your comment here"></textarea>
     <button onclick="submitComment()">Submit</button>
