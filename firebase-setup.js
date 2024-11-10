@@ -1,8 +1,9 @@
-// Import the necessary Firebase functions
+// Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
 import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-// Your Firebase configuration
+// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCrxSA-Y5FjKCkULoQ3iwCiKaupZOSK9FU",
   authDomain: "soniccdfansite.firebaseapp.com",
@@ -15,9 +16,24 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 const db = getFirestore(app);
 
-// Utility function to manage cookies (get, set, and check)
+// Checking if the user is logged in from the cookie
+const loggedInUser = getCookie("loggedInUser");
+
+if (loggedInUser) {
+  // User is logged in, show comment section
+  document.getElementById('login-section').style.display = 'none';
+  document.getElementById('register-section').style.display = 'none';
+  document.getElementById('comment-section').style.display = 'block';
+} else {
+  // User is not logged in, show login/register section
+  document.getElementById('login-section').style.display = 'block';
+  document.getElementById('register-section').style.display = 'block';
+  document.getElementById('comment-section').style.display = 'none';
+}
+
 function setCookie(name, value, days) {
   const date = new Date();
   date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -40,9 +56,6 @@ function getCookie(name) {
 function eraseCookie(name) {
   document.cookie = name + '=; Max-Age=-99999999;';
 }
-
-// Check if the user is logged in by checking cookies
-let loggedInUser = getCookie("loggedInUser");
 
 function displayMessage(elementId, message, isError = true) {
   const element = document.getElementById(elementId);
@@ -89,9 +102,11 @@ async function loginUser(username, password) {
     const userData = userDoc.data();
     if (userData.password === password) {
       loggedInUser = username;
-      setCookie("loggedInUser", username, 7);  // Set cookie for 7 days only during login
+      setCookie("loggedInUser", username, 7);  // Set cookie for 7 days on successful login
       displayMessage('login-error-message', 'User logged in successfully!', false);
-      loadComments();  // Load comments after login
+      loadComments();  // Load comments after successful login
+      document.getElementById('login-section').style.display = 'none';
+      document.getElementById('comment-section').style.display = 'block';
     } else {
       displayMessage('login-error-message', 'Incorrect password!');
     }
@@ -100,10 +115,15 @@ async function loginUser(username, password) {
   }
 }
 
-window.registerUser = registerUser;
-window.loginUser = loginUser;
+function logoutUser() {
+  eraseCookie("loggedInUser");
+  loggedInUser = null;
+  document.getElementById('login-section').style.display = 'block';
+  document.getElementById('comment-section').style.display = 'none';
+  displayMessage('login-error-message', 'Logged out successfully!', false);
+}
 
-window.submitComment = async function() {
+async function submitComment() {
   if (!loggedInUser) {
     alert('You need to be logged in to do that.');
     return;
@@ -119,15 +139,15 @@ window.submitComment = async function() {
   try {
     const docRef = await addDoc(collection(db, "comments"), {
       name: loggedInUser,
-      comment,
-      createdAt
+      comment: comment,
+      createdAt: createdAt
     });
     document.getElementById('comment').value = '';
-    loadComments();  // Reload comments after submission
+    loadComments();  // Reload comments after submitting
   } catch (e) {
-    console.error("Error adding comment:", e);
+    console.error("Error adding document: ", e);
   }
-};
+}
 
 function loadComments() {
   const commentsRef = collection(db, "comments");
@@ -139,61 +159,9 @@ function loadComments() {
       const commentData = doc.data();
       const commentElement = document.createElement('div');
       const commentText = document.createElement('p');
-      const commentTimestamp = document.createElement('p');
-
-      // Check if the comment is from the user "SDG"
-      if (commentData.name === "SDG") {
-        // Apply reverse rainbow effect on username
-        commentText.appendChild(rainbowText(`${commentData.name}: `, true));
-        
-        // Apply rainbow effect to the comment text
-        const commentParts = commentData.comment.split('\n').map(part => rainbowText(part));
-        commentParts.forEach(part => {
-          commentText.appendChild(part);
-          commentText.appendChild(document.createElement('br'));
-        });
-
-        // Apply outline effect to SDG comment text
-        applyOutlineStyle(commentText);  // Add black outline
-      } else {
-        // Regular style for other users
-        commentText.textContent = `${commentData.name}: ${commentData.comment}`;
-      }
-
-      // Timestamp formatting
-      commentTimestamp.textContent = new Date(commentData.createdAt).toLocaleString();
-      commentTimestamp.style.fontSize = 'small';
-      commentTimestamp.style.fontStyle = 'italic';
-      commentTimestamp.style.color = 'rgba(0, 0, 0, 0.6)';
-      commentTimestamp.style.marginTop = '-10px';
-
-      // Append elements to the comment container
+      commentText.textContent = `${commentData.name}: ${commentData.comment}`;
       commentElement.appendChild(commentText);
-      commentElement.appendChild(commentTimestamp);
-      commentsContainer.appendChild(commentElement);
+      commentsContainer.appendChild(commentElement);  // Append to show newest comments at the bottom
     });
   });
-}
-
-window.onload = function() {
-  loadComments();  // Load comments on page load
-};
-
-function rainbowText(text, reverse = false) {
-  const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
-  if (reverse) colors.reverse();
-  const span = document.createElement('span');
-  for (let i = 0; i < text.length; i++) {
-    const charSpan = document.createElement('span');
-    charSpan.style.color = colors[i % colors.length];
-    charSpan.textContent = text[i];
-    span.appendChild(charSpan);
-  }
-  return span;
-}
-
-function applyOutlineStyle(element) {
-  // Apply webkit text stroke (real outline effect)
-  element.style.webkitTextStroke = '0.5px black'; // Black outline
-  element.style.textFillColor = 'white'; // Text color
 }
