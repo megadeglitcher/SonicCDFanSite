@@ -31,11 +31,10 @@ function displayMessage(elementId, message, isError = true) {
 
 // Register user function
 async function registerUser() {
+  // Get values from input fields
   const username = document.getElementById('register-username').value;
   const email = document.getElementById('register-email').value;
   const password = document.getElementById('register-password').value;
-
-  console.log("Registering user...", username, email, password);
 
   // Check if any input is empty or undefined
   if (!username || !email || !password) {
@@ -75,6 +74,9 @@ async function registerUser() {
     displayMessage('register-error-message', 'Error registering user: ' + e.message);
   }
 }
+
+// Add event listener for the register button
+document.getElementById('register-btn').addEventListener('click', registerUser);
 
 // Login user function
 async function loginUser() {
