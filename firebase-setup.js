@@ -44,7 +44,6 @@ function eraseCookie(name) {
 // Check if the user is logged in by checking cookies
 let loggedInUser = getCookie("loggedInUser");
 
-// Function to display messages to the user (success or error)
 function displayMessage(elementId, message, isError = true) {
   const element = document.getElementById(elementId);
   element.textContent = message;
@@ -54,7 +53,6 @@ function displayMessage(elementId, message, isError = true) {
   }, 5000);
 }
 
-// Register user function
 async function registerUser(username, password) {
   username = username.trim();
   if (!username) {
@@ -75,7 +73,6 @@ async function registerUser(username, password) {
   }
 }
 
-// Login user function
 async function loginUser(username, password) {
   username = username.trim();
   if (!username) {
@@ -92,10 +89,9 @@ async function loginUser(username, password) {
     const userData = userDoc.data();
     if (userData.password === password) {
       loggedInUser = username;
-      setCookie("loggedInUser", username, 7);  // Set cookie for 7 days
+      setCookie("loggedInUser", username, 7);  // Set cookie for 7 days only during login
       displayMessage('login-error-message', 'User logged in successfully!', false);
-      loadComments();  // Load comments immediately after login
-      checkLoginState();  // Update UI after login
+      loadComments();  // Load comments after login
     } else {
       displayMessage('login-error-message', 'Incorrect password!');
     }
@@ -104,30 +100,9 @@ async function loginUser(username, password) {
   }
 }
 
-// Log off function
-function logOff() {
-  eraseCookie("loggedInUser");  // Clear the logged-in user cookie
-  loggedInUser = null;  // Clear the logged-in user variable
-  displayMessage('login-error-message', 'You have been logged out.', false);  // Display logged-out message
-  checkLoginState();  // Update UI after log off
-  loadComments();  // Reload comments after logging out (optional)
-}
+window.registerUser = registerUser;
+window.loginUser = loginUser;
 
-// Check if the user is logged in
-function checkLoginState() {
-  if (loggedInUser) {
-    document.getElementById('comment-section').style.display = 'block';  // Show comment section
-    document.getElementById('login-error-message').textContent = 'Welcome back, ' + loggedInUser + '!';
-    document.getElementById('login-form').style.display = 'none';  // Hide login form
-    document.getElementById('logoff-button').style.display = 'inline';  // Show log off button
-  } else {
-    document.getElementById('comment-section').style.display = 'none';  // Hide comment section
-    document.getElementById('login-form').style.display = 'block';  // Show login form
-    document.getElementById('logoff-button').style.display = 'none';  // Hide log off button
-  }
-}
-
-// Submit comment function
 window.submitComment = async function() {
   if (!loggedInUser) {
     alert('You need to be logged in to do that.');
@@ -142,19 +117,18 @@ window.submitComment = async function() {
   const createdAt = new Date().toISOString();  // Store in UTC
 
   try {
-    await addDoc(collection(db, "comments"), {
+    const docRef = await addDoc(collection(db, "comments"), {
       name: loggedInUser,
       comment,
       createdAt
     });
-    document.getElementById('comment').value = '';  // Clear the input field
+    document.getElementById('comment').value = '';
     loadComments();  // Reload comments after submission
   } catch (e) {
     console.error("Error adding comment:", e);
   }
 };
 
-// Load comments function
 function loadComments() {
   const commentsRef = collection(db, "comments");
   const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
@@ -171,7 +145,7 @@ function loadComments() {
       if (commentData.name === "SDG") {
         // Apply reverse rainbow effect on username
         commentText.appendChild(rainbowText(`${commentData.name}: `, true));
-
+        
         // Apply rainbow effect to the comment text
         const commentParts = commentData.comment.split('\n').map(part => rainbowText(part));
         commentParts.forEach(part => {
@@ -201,7 +175,10 @@ function loadComments() {
   });
 }
 
-// Call this function to ensure the comment section is shown only if the user is logged in
+window.onload = function() {
+  loadComments();  // Load comments on page load
+};
+
 function rainbowText(text, reverse = false) {
   const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
   if (reverse) colors.reverse();
@@ -215,14 +192,8 @@ function rainbowText(text, reverse = false) {
   return span;
 }
 
-// Apply outline style to SDG's comment text
 function applyOutlineStyle(element) {
+  // Apply webkit text stroke (real outline effect)
   element.style.webkitTextStroke = '0.5px black'; // Black outline
   element.style.textFillColor = 'white'; // Text color
 }
-
-// On page load, check login state
-window.onload = function() {
-  checkLoginState();  // Check if the user is logged in
-  loadComments();  // Load comments on page load
-};
