@@ -38,13 +38,12 @@ function getCookie(name) {
 }
 
 function eraseCookie(name) {
-  document.cookie = name + '=; Max-Age=-99999999;';  // Clear the cookie
+  document.cookie = name + '=; Max-Age=-99999999;';
 }
 
 // Check if the user is logged in by checking cookies
 let loggedInUser = getCookie("loggedInUser");
 
-// Function to display messages (error/success)
 function displayMessage(elementId, message, isError = true) {
   const element = document.getElementById(elementId);
   element.textContent = message;
@@ -54,7 +53,6 @@ function displayMessage(elementId, message, isError = true) {
   }, 5000);
 }
 
-// Register User
 async function registerUser(username, password) {
   username = username.trim();
   if (!username) {
@@ -75,7 +73,6 @@ async function registerUser(username, password) {
   }
 }
 
-// Login User
 async function loginUser(username, password) {
   username = username.trim();
   if (!username) {
@@ -92,7 +89,7 @@ async function loginUser(username, password) {
     const userData = userDoc.data();
     if (userData.password === password) {
       loggedInUser = username;
-      setCookie("loggedInUser", username, 7);  // Set cookie only on successful login
+      setCookie("loggedInUser", username, 7);  // Set cookie for 7 days only during login
       displayMessage('login-error-message', 'User logged in successfully!', false);
       loadComments();  // Load comments after login
     } else {
@@ -103,23 +100,9 @@ async function loginUser(username, password) {
   }
 }
 
-// Logout User
-window.logOff = function() {
-  eraseCookie("loggedInUser");  // Clear the cookie
-  loggedInUser = null;  // Reset logged-in user in JavaScript
+window.registerUser = registerUser;
+window.loginUser = loginUser;
 
-  displayMessage('login-error-message', 'You have been logged out.', false);
-
-  // Reload the comments to show the state after logging out
-  loadComments();
-
-  // Hide the comment section and show the register section
-  document.getElementById('comment-section').style.display = 'none';
-  document.getElementById('register-section').style.display = 'block';
-  document.getElementById('logout-button').style.display = 'none';
-};
-
-// Submit Comment
 window.submitComment = async function() {
   if (!loggedInUser) {
     alert('You need to be logged in to do that.');
@@ -146,7 +129,21 @@ window.submitComment = async function() {
   }
 };
 
-// Load Comments
+// Add this function to handle the log off functionality
+window.logOff = function() {
+  eraseCookie("loggedInUser");  // Clear the cookie
+  loggedInUser = null;  // Reset logged-in user in JavaScript
+
+  displayMessage('login-error-message', 'You have been logged out.', false);
+
+  // Reload the comments to show the state after logging out
+  loadComments();
+
+  // Optionally, update the UI to show login buttons and hide comment form
+  document.getElementById('comment-section').style.display = 'none';
+  document.getElementById('login-section').style.display = 'block';
+};
+
 function loadComments() {
   const commentsRef = collection(db, "comments");
   const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
@@ -193,26 +190,10 @@ function loadComments() {
   });
 }
 
-// Initialize page behavior when loaded
 window.onload = function() {
-  // Check if a user is already logged in by checking the cookie
-  if (loggedInUser) {
-    // User is logged in - hide the registration form and show the comment section
-    document.getElementById('register-section').style.display = 'none';
-    document.getElementById('comment-section').style.display = 'block';
-    
-    // Optionally, you can show the user's username or a logout button
-    document.getElementById('logged-in-user').textContent = `Logged in as: ${loggedInUser}`;
-    document.getElementById('logout-button').style.display = 'block';
-  } else {
-    // If no user is logged in, show the registration form
-    document.getElementById('register-section').style.display = 'block';
-    document.getElementById('comment-section').style.display = 'none';
-    document.getElementById('logout-button').style.display = 'none';
-  }
+  loadComments();  // Load comments on page load
 };
 
-// Function for rainbow text effect
 function rainbowText(text, reverse = false) {
   const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
   if (reverse) colors.reverse();
@@ -226,10 +207,8 @@ function rainbowText(text, reverse = false) {
   return span;
 }
 
-// Function for outline effect
 function applyOutlineStyle(element) {
   // Apply webkit text stroke (real outline effect)
   element.style.webkitTextStroke = '0.5px black'; // Black outline
   element.style.textFillColor = 'white'; // Text color
 }
-
