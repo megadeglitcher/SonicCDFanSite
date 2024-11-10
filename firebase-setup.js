@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -19,20 +19,64 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
 
+let loggedInUser = null;
+
+async function registerUser(username, password) {
+  try {
+    const userDoc = await getDoc(doc(db, "users", username));
+    if (userDoc.exists()) {
+      console.error("Username already exists!");
+      return;
+    }
+    await setDoc(doc(db, "users", username), {
+      username: username,
+      password: password
+    });
+    console.log("User registered successfully!");
+  } catch (e) {
+    console.error("Error registering user: ", e);
+  }
+}
+
+async function loginUser(username, password) {
+  try {
+    const userDoc = await getDoc(doc(db, "users", username));
+    if (!userDoc.exists()) {
+      console.error("Username does not exist!");
+      return;
+    }
+    const userData = userDoc.data();
+    if (userData.password === password) {
+      console.log("User logged in successfully!");
+      loggedInUser = username;  // Store the logged-in user's username
+      // Handle successful login
+    } else {
+      console.error("Incorrect password!");
+    }
+  } catch (e) {
+    console.error("Error logging in: ", e);
+  }
+}
+
+window.registerUser = registerUser;
+window.loginUser = loginUser;
+
 window.submitComment = async function() {
-  const name = document.getElementById('name').value || "Anonymous";
+  if (!loggedInUser) {
+    console.error("User must be logged in to submit a comment");
+    return;
+  }
   const comment = document.getElementById('comment').value || "No comment provided";
 
   try {
     const docRef = await addDoc(collection(db, "comments"), {
-      name: name,
+      name: loggedInUser,
       comment: comment,
-      createdAt: serverTimestamp()  // Add a timestamp
+      createdAt: serverTimestamp()
     });
     console.log("Document written with ID: ", docRef.id);
-    document.getElementById('name').value = '';
     document.getElementById('comment').value = '';
-    loadComments();  // Load comments immediately after submitting
+    loadComments();
   } catch (e) {
     console.error("Error adding document: ", e);
   }
@@ -40,7 +84,7 @@ window.submitComment = async function() {
 
 window.loadComments = function() {
   const commentsRef = collection(db, "comments");
-  const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));  // Order by timestamp descending
+  const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
   onSnapshot(commentsQuery, (snapshot) => {
     const commentsContainer = document.getElementById('comments-container');
     commentsContainer.innerHTML = '';
