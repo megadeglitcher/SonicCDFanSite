@@ -20,10 +20,18 @@ const db = getFirestore(app);
 async function displayUserProfile() {
   // Extract the username from the URL hash (e.g., #/User/SDG)
   const hash = window.location.hash;
-  const username = hash.split('/')[2];  // Get the username part of the hash (after "/User/")
+  const parts = hash.split('/');  // Split the hash string by "/"
+  
+  // Ensure the hash follows the correct format "#/User/{username}"
+  if (parts.length < 3 || parts[1] !== 'User') {
+    document.getElementById('error-message').textContent = 'Invalid URL format. Expected: /user-profile.html#/User/{username}';
+    return;
+  }
+
+  const username = parts[2];  // Extract username (the part after "/User/")
 
   if (!username) {
-    document.getElementById('error-message').textContent = 'Invalid URL. Username is required.';
+    document.getElementById('error-message').textContent = 'Username is required in the URL.';
     return;
   }
 
