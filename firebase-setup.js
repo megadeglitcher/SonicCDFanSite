@@ -125,18 +125,24 @@ window.loadComments = function() {
       const commentText = document.createElement('p');
       const commentTimestamp = document.createElement('p');
 
-      const commentParts = commentData.comment.split('\n').map(part => document.createTextNode(part));
-      commentText.textContent = `${commentData.name}: `;
-      commentParts.forEach(part => {
-        commentText.appendChild(part);
-        commentText.appendChild(document.createElement('br'));
+      const commentParts = commentData.comment.split('\n').map((part, index) => {
+        const span = document.createElement('span');
+        span.textContent = part;
+        if (index < commentParts.length - 1) {
+          span.appendChild(document.createElement('br'));
+        }
+        return span;
       });
+
+      commentText.innerHTML = `<strong>${commentData.name}:</strong>`;
+      commentParts.forEach(part => commentText.appendChild(part));
+      commentText.style.marginBottom = '0px';
 
       commentTimestamp.textContent = formatTimestamp(commentData.createdAt);
       commentTimestamp.style.fontSize = 'small';
       commentTimestamp.style.fontStyle = 'italic';
       commentTimestamp.style.color = 'rgba(0, 0, 0, 0.6)';
-      commentTimestamp.style.marginTop = '0px';
+      commentTimestamp.style.marginTop = '-5px';
 
       commentElement.appendChild(commentText);
       commentElement.appendChild(commentTimestamp);
