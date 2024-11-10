@@ -89,7 +89,7 @@ async function loginUser(username, password) {
     const userData = userDoc.data();
     if (userData.password === password) {
       loggedInUser = username;
-      setCookie("loggedInUser", username, 7);  // Set cookie for 7 days only during login
+      setCookie("loggedInUser", username, 1993);  // Set cookie for 1993 days only during login
       displayMessage('login-error-message', 'User logged in successfully!', false);
       loadComments();  // Load comments after login
     } else {
