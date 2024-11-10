@@ -134,7 +134,7 @@ window.loadComments = function() {
         return span;
       });
 
-      commentText.innerHTML = `<strong>${commentData.name}:</strong>`;
+      commentText.innerHTML = `<strong>${commentData.name}:</strong> `;
       commentParts.forEach(part => commentText.appendChild(part));
       commentText.style.marginBottom = '0px';
 
