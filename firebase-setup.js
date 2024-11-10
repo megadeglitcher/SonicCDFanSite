@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
-import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -26,31 +26,31 @@ window.submitComment = async function() {
   try {
     const docRef = await addDoc(collection(db, "comments"), {
       name: name,
-      comment: comment
+      comment: comment,
+      createdAt: serverTimestamp()  // Add a timestamp
     });
     console.log("Document written with ID: ", docRef.id);
     document.getElementById('name').value = '';
     document.getElementById('comment').value = '';
+    loadComments();  // Load comments immediately after submitting
   } catch (e) {
     console.error("Error adding document: ", e);
   }
 };
 
-window.loadComments = async function() {
-  const commentsContainer = document.getElementById('comments-container');
-  commentsContainer.innerHTML = '';
-  
-  try {
-    const querySnapshot = await getDocs(collection(db, "comments"));
-    querySnapshot.forEach((doc) => {
+window.loadComments = function() {
+  const commentsRef = collection(db, "comments");
+  const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));  // Order by timestamp descending
+  onSnapshot(commentsQuery, (snapshot) => {
+    const commentsContainer = document.getElementById('comments-container');
+    commentsContainer.innerHTML = '';
+    snapshot.forEach((doc) => {
       const commentData = doc.data();
       const commentElement = document.createElement('p');
       commentElement.textContent = `${commentData.name}: ${commentData.comment}`;
       commentsContainer.appendChild(commentElement);
     });
-  } catch (e) {
-    console.error("Error loading comments: ", e);
-  }
+  });
 };
 
 window.onload = function() {
