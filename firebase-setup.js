@@ -1,105 +1,219 @@
+// Import the necessary Firebase functions
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-// Firebase configuration
+// Your Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCrxSA-Y5FjKCkULoQ3iwCiKaupZOSK9FU",
-  authDomain: "your-project-id.firebaseapp.com", // Replace with your Firebase project ID
-  projectId: "your-project-id",
-  storageBucket: "your-project-id.appspot.com",
-  messagingSenderId: "your-sender-id",
-  appId: "your-app-id",
+  authDomain: "soniccdfansite.firebaseapp.com",
+  projectId: "soniccdfansite",
+  storageBucket: "soniccdfansite.firebasestorage.app",
+  messagingSenderId: "739250141699",
+  appId: "1:739250141699:web:1925788f3944b1aa58ac36",
+  measurementId: "G-EQK0WQWQ33"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth();
-const db = getFirestore();
+const db = getFirestore(app);
 
-// Check if user is logged in
-onAuthStateChanged(auth, (user) => {
-  const userStatus = document.getElementById('user-status');
-  if (user) {
-    userStatus.textContent = `Logged in as: ${user.email}`;
-    document.getElementById('login-section').style.display = 'none';
-    document.getElementById('register-section').style.display = 'none';
-  } else {
-    userStatus.textContent = 'You are not logged in.';
-  }
-});
+// Utility function to manage cookies (get, set, and check)
+function setCookie(name, value, days) {
+  const date = new Date();
+  date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+  const expires = "expires=" + date.toUTCString();
+  document.cookie = name + "=" + value + ";" + expires + ";path=/";
+}
 
-// Register User
-document.getElementById('register-btn').addEventListener('click', async () => {
-  const email = document.getElementById('register-email').value.trim();
-  const password = document.getElementById('register-password').value.trim();
-
-  if (email === '' || password === '') {
-    document.getElementById('register-error').textContent = 'Please fill in both fields.';
-    return;
-  }
-
-  try {
-    await createUserWithEmailAndPassword(auth, email, password);
-    document.getElementById('register-error').textContent = 'Registration successful!';
-  } catch (error) {
-    document.getElementById('register-error').textContent = error.message;
-  }
-});
-
-// Login User
-document.getElementById('login-btn').addEventListener('click', async () => {
-  const email = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value.trim();
-
-  if (email === '' || password === '') {
-    document.getElementById('login-error').textContent = 'Please fill in both fields.';
-    return;
-  }
-
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    document.getElementById('login-error').textContent = 'Login successful!';
-  } catch (error) {
-    document.getElementById('login-error').textContent = error.message;
-  }
-});
-
-// Submit Comment
-document.getElementById('submit-comment-btn').addEventListener('click', async () => {
-  const commentInput = document.getElementById('comment-input').value.trim();
-
-  if (!commentInput) {
-    displayMessage('comment-error-message', 'Comment cannot be empty!');
-    return;
-  }
-
-  try {
-    const user = auth.currentUser;
-    if (user) {
-      // If user is logged in, submit the comment
-      const newComment = {
-        userId: user.uid,
-        comment: commentInput,
-        timestamp: new Date(),
-      };
-
-      // Add the comment to Firestore collection 'comments'
-      await addDoc(collection(db, 'comments'), newComment);
-      document.getElementById('comment-input').value = ''; // Clear input
-      displayMessage('comment-error-message', 'Comment submitted successfully!', true);
-    } else {
-      displayMessage('comment-error-message', 'You need to log in to submit a comment.');
+function getCookie(name) {
+  const nameEQ = name + "=";
+  const ca = document.cookie.split(';');
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i].trim();
+    if (c.indexOf(nameEQ) === 0) {
+      return c.substring(nameEQ.length, c.length);
     }
-  } catch (error) {
-    console.error('Error submitting comment: ', error);
-    displayMessage('comment-error-message', 'Error submitting comment. Please try again later.');
   }
-});
+  return null;
+}
 
-// Display error or success message
-function displayMessage(elementId, message, success = false) {
+function eraseCookie(name) {
+  document.cookie = name + '=; Max-Age=-99999999;';
+}
+
+// Check if the user is logged in by checking cookies
+let loggedInUser = getCookie("loggedInUser");
+
+function displayMessage(elementId, message, isError = true) {
   const element = document.getElementById(elementId);
-  element.style.color = success ? 'green' : 'red';
   element.textContent = message;
+  element.style.color = isError ? 'red' : 'green';
+  setTimeout(() => {
+    element.textContent = '';
+  }, 5000);
+}
+
+async function registerUser(username, password) {
+  username = username.trim();
+  if (!username) {
+    displayMessage('register-error-message', 'Username cannot be empty or just whitespace!');
+    return;
+  }
+
+  try {
+    const userDoc = await getDoc(doc(db, "users", username));
+    if (userDoc.exists()) {
+      displayMessage('register-error-message', 'Username already in use!');
+      return;
+    }
+    const createdAt = new Date().toISOString(); // Get the current date and time
+    await setDoc(doc(db, "users", username), { 
+      username, 
+      password,
+      createdAt  // Store user creation date
+    });
+    displayMessage('register-error-message', 'User registered successfully!', false);
+  } catch (e) {
+    displayMessage('register-error-message', 'Error registering user.');
+  }
+}
+
+async function loginUser(username, password) {
+  username = username.trim();
+  if (!username) {
+    displayMessage('login-error-message', 'Username cannot be empty or just whitespace!');
+    return;
+  }
+
+  try {
+    const userDoc = await getDoc(doc(db, "users", username));
+    if (!userDoc.exists()) {
+      displayMessage('login-error-message', 'Username does not exist!');
+      return;
+    }
+    const userData = userDoc.data();
+    if (userData.password === password) {
+      loggedInUser = username;
+      setCookie("loggedInUser", username, 1993);  // Set cookie for 1993 days only during login
+      displayMessage('login-error-message', 'User logged in successfully!', false);
+      loadComments();  // Load comments after login
+    } else {
+      displayMessage('login-error-message', 'Incorrect password!');
+    }
+  } catch (e) {
+    displayMessage('login-error-message', 'Error logging in.');
+  }
+}
+
+window.registerUser = registerUser;
+window.loginUser = loginUser;
+
+window.submitComment = async function() {
+  if (!loggedInUser) {
+    alert('You need to be logged in to do that.');
+    return;
+  }
+  const comment = document.getElementById('comment').value.trim();
+  if (!comment) {
+    alert('Comment cannot be blank!');
+    return;
+  }
+
+  const createdAt = new Date().toISOString();  // Store in UTC
+
+  try {
+    const docRef = await addDoc(collection(db, "comments"), {
+      name: loggedInUser,
+      comment,
+      createdAt
+    });
+    document.getElementById('comment').value = '';
+    loadComments();  // Reload comments after submission
+  } catch (e) {
+    console.error("Error adding comment:", e);
+  }
+};
+
+// Add this function to handle the log off functionality
+window.logOff = function() {
+  eraseCookie("loggedInUser");  // Clear the cookie
+  loggedInUser = null;  // Reset logged-in user in JavaScript
+
+  displayMessage('login-error-message', 'You have been logged out.', false);
+
+  // Reload the comments to show the state after logging out
+  loadComments();
+
+  // Optionally, update the UI to show login buttons and hide comment form
+  document.getElementById('comment-section').style.display = 'none';
+  document.getElementById('login-section').style.display = 'block';
+};
+
+function loadComments() {
+  const commentsRef = collection(db, "comments");
+  const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
+  onSnapshot(commentsQuery, (snapshot) => {
+    const commentsContainer = document.getElementById('comments-container');
+    commentsContainer.innerHTML = '';  // Clear previous comments
+    snapshot.forEach((doc) => {
+      const commentData = doc.data();
+      const commentElement = document.createElement('div');
+      const commentText = document.createElement('p');
+      const commentTimestamp = document.createElement('p');
+
+      // Check if the comment is from the user "SDG"
+      if (commentData.name === "SDG") {
+        // Apply reverse rainbow effect on username
+        commentText.appendChild(rainbowText(`${commentData.name}: `, true));
+        
+        // Apply rainbow effect to the comment text
+        const commentParts = commentData.comment.split('\n').map(part => rainbowText(part));
+        commentParts.forEach(part => {
+          commentText.appendChild(part);
+          commentText.appendChild(document.createElement('br'));
+        });
+
+        // Apply outline effect to SDG comment text
+        applyOutlineStyle(commentText);  // Add black outline
+      } else {
+        // Regular style for other users
+        commentText.textContent = `${commentData.name}: ${commentData.comment}`;
+      }
+
+      // Timestamp formatting
+      commentTimestamp.textContent = new Date(commentData.createdAt).toLocaleString();
+      commentTimestamp.style.fontSize = 'small';
+      commentTimestamp.style.fontStyle = 'italic';
+      commentTimestamp.style.color = 'rgba(0, 0, 0, 0.6)';
+      commentTimestamp.style.marginTop = '-10px';
+
+      // Append elements to the comment container
+      commentElement.appendChild(commentText);
+      commentElement.appendChild(commentTimestamp);
+      commentsContainer.appendChild(commentElement);
+    });
+  });
+}
+
+window.onload = function() {
+  loadComments();  // Load comments on page load
+};
+
+function rainbowText(text, reverse = false) {
+  const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
+  if (reverse) colors.reverse();
+  const span = document.createElement('span');
+  for (let i = 0; i < text.length; i++) {
+    const charSpan = document.createElement('span');
+    charSpan.style.color = colors[i % colors.length];
+    charSpan.textContent = text[i];
+    span.appendChild(charSpan);
+  }
+  return span;
+}
+
+function applyOutlineStyle(element) {
+  // Apply webkit text stroke (real outline effect)
+  element.style.webkitTextStroke = '0.5px black'; // Black outline
+  element.style.textFillColor = 'white'; // Text color
 }
