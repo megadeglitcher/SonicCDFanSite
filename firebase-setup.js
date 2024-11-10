@@ -115,7 +115,7 @@ window.loadComments = function() {
       const localDateString = createdAt.toLocaleDateString('en-GB');
       const localTimeString = createdAt.toLocaleTimeString('en-GB');
 
-      commentElement.textContent = `${commentData.name}: ${commentData.comment} (${localDateString} - ${localTimeString})`;
+      commentElement.textContent = `${commentData.name}: ${commentData.comment} (${localDateString} ~ ${localTimeString})`;
       commentsContainer.appendChild(commentElement);
     });
   });
