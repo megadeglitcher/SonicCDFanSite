@@ -53,7 +53,6 @@ function displayMessage(elementId, message, isError = true) {
   }, 5000);
 }
 
-// Register user function
 async function registerUser(username, password) {
   username = username.trim();
   if (!username) {
@@ -67,14 +66,18 @@ async function registerUser(username, password) {
       displayMessage('register-error-message', 'Username already in use!');
       return;
     }
-    await setDoc(doc(db, "users", username), { username, password });
+    const createdAt = new Date().toISOString(); // Get the current date and time
+    await setDoc(doc(db, "users", username), { 
+      username, 
+      password,
+      createdAt  // Store user creation date
+    });
     displayMessage('register-error-message', 'User registered successfully!', false);
   } catch (e) {
     displayMessage('register-error-message', 'Error registering user.');
   }
 }
 
-// Login user function
 async function loginUser(username, password) {
   username = username.trim();
   if (!username) {
@@ -94,7 +97,6 @@ async function loginUser(username, password) {
       setCookie("loggedInUser", username, 1993);  // Set cookie for 1993 days only during login
       displayMessage('login-error-message', 'User logged in successfully!', false);
       loadComments();  // Load comments after login
-      document.getElementById('logoff-btn').style.display = 'inline'; // Show log off button
     } else {
       displayMessage('login-error-message', 'Incorrect password!');
     }
@@ -103,21 +105,9 @@ async function loginUser(username, password) {
   }
 }
 
-// Format timestamp as DDMMYYYYHHMMSS
-function getFormattedTimestamp() {
-  const now = new Date();
-  const day = String(now.getDate()).padStart(2, '0'); // Ensure two digits for day
-  const month = String(now.getMonth() + 1).padStart(2, '0'); // Ensure two digits for month
-  const year = now.getFullYear();
-  const hours = String(now.getHours()).padStart(2, '0'); // Ensure two digits for hours
-  const minutes = String(now.getMinutes()).padStart(2, '0'); // Ensure two digits for minutes
-  const seconds = String(now.getSeconds()).padStart(2, '0'); // Ensure two digits for seconds
+window.registerUser = registerUser;
+window.loginUser = loginUser;
 
-  // Return timestamp in DDMMYYYYHHMMSS format
-  return `${day}${month}${year}${hours}${minutes}${seconds}`;
-}
-
-// Submit comment function
 window.submitComment = async function() {
   if (!loggedInUser) {
     alert('You need to be logged in to do that.');
@@ -129,7 +119,7 @@ window.submitComment = async function() {
     return;
   }
 
-  const createdAt = getFormattedTimestamp();  // Use the new timestamp format
+  const createdAt = new Date().toISOString();  // Store in UTC
 
   try {
     const docRef = await addDoc(collection(db, "comments"), {
@@ -144,7 +134,21 @@ window.submitComment = async function() {
   }
 };
 
-// Load comments from Firestore
+// Add this function to handle the log off functionality
+window.logOff = function() {
+  eraseCookie("loggedInUser");  // Clear the cookie
+  loggedInUser = null;  // Reset logged-in user in JavaScript
+
+  displayMessage('login-error-message', 'You have been logged out.', false);
+
+  // Reload the comments to show the state after logging out
+  loadComments();
+
+  // Optionally, update the UI to show login buttons and hide comment form
+  document.getElementById('comment-section').style.display = 'none';
+  document.getElementById('login-section').style.display = 'block';
+};
+
 function loadComments() {
   const commentsRef = collection(db, "comments");
   const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
@@ -176,13 +180,14 @@ function loadComments() {
         commentText.textContent = `${commentData.name}: ${commentData.comment}`;
       }
 
-      // Format the timestamp from DDMMYYYYHHMMSS
-      const formattedTimestamp = formatTimestamp(commentData.createdAt);
-      commentTimestamp.textContent = formattedTimestamp;
+      // Timestamp formatting
+      commentTimestamp.textContent = new Date(commentData.createdAt).toLocaleString();
       commentTimestamp.style.fontSize = 'small';
       commentTimestamp.style.fontStyle = 'italic';
-      commentTimestamp.style.color = 'rgba(0, 0, 0, 0.5)';
+      commentTimestamp.style.color = 'rgba(0, 0, 0, 0.6)';
+      commentTimestamp.style.marginTop = '-10px';
 
+      // Append elements to the comment container
       commentElement.appendChild(commentText);
       commentElement.appendChild(commentTimestamp);
       commentsContainer.appendChild(commentElement);
@@ -190,54 +195,25 @@ function loadComments() {
   });
 }
 
-// Function to format timestamp
-function formatTimestamp(timestamp) {
-  const day = timestamp.substring(0, 2);
-  const month = timestamp.substring(2, 4);
-  const year = timestamp.substring(4, 8);
-  const hour = timestamp.substring(8, 10);
-  const minute = timestamp.substring(10, 12);
-  const second = timestamp.substring(12, 14);
-
-  return `${day}/${month}/${year} ${hour}:${minute}:${second}`;
-}
-
-// Log off function
-window.logOff = function() {
-  eraseCookie("loggedInUser");
-  loggedInUser = null;
-  loadComments();
-  document.getElementById('logoff-btn').style.display = 'none';
-  alert('You have logged off!');
+window.onload = function() {
+  loadComments();  // Load comments on page load
 };
 
-// Apply rainbow text effect
-function rainbowText(text, isUsername = false) {
-  const rainbowColors = ["#FF0000", "#FF7F00", "#FFFF00", "#00FF00", "#0000FF", "#4B0082", "#8B00FF"];
-  const spanElement = document.createElement('span');
-  let colorIndex = 0;
-
+function rainbowText(text, reverse = false) {
+  const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
+  if (reverse) colors.reverse();
+  const span = document.createElement('span');
   for (let i = 0; i < text.length; i++) {
-    const letter = document.createElement('span');
-    letter.textContent = text[i];
-    letter.style.color = rainbowColors[colorIndex];
-    if (isUsername) {
-      letter.style.fontWeight = 'bold';
-    }
-    spanElement.appendChild(letter);
-    colorIndex = (colorIndex + 1) % rainbowColors.length;  // Loop through colors
+    const charSpan = document.createElement('span');
+    charSpan.style.color = colors[i % colors.length];
+    charSpan.textContent = text[i];
+    span.appendChild(charSpan);
   }
-
-  return spanElement;
+  return span;
 }
 
-// Apply outline effect
 function applyOutlineStyle(element) {
-  const style = `
-    text-shadow:
-      2px 2px 0px #000, 0px 2px 0px #000, -2px 2px 0px #000, 
-      2px -2px 0px #000, -2px -2px 0px #000, 
-      2px 0px 0px #000, 0px 2px 0px #000, -2px 0px 0px #000, 0px -2px 0px #000;
-  `;
-  element.style.cssText += style;
+  // Apply webkit text stroke (real outline effect)
+  element.style.webkitTextStroke = '0.5px black'; // Black outline
+  element.style.textFillColor = 'white'; // Text color
 }
