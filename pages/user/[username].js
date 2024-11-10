@@ -1,59 +1,40 @@
-// pages/user/[username].js
+import { useRouter } from 'next/router';
+import { getDoc, doc } from 'firebase/firestore';
+import { db } from '../../firebase-setup'; // Assuming you have Firebase set up
 
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
-import { initializeApp } from 'firebase/app';
+const UserProfile = () => {
+  // Use Next.js's useRouter hook to get the dynamic part of the URL
+  const router = useRouter();
+  const { username } = router.query;  // username will be the dynamic part of the URL
 
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyCrxSA-Y5FjKCkULoQ3iwCiKaupZOSK9FU",
-  authDomain: "soniccdfansite.firebaseapp.com",
-  projectId: "soniccdfansite",
-  storageBucket: "soniccdfansite.firebasestorage.app",
-  messagingSenderId: "739250141699",
-  appId: "1:739250141699:web:1925788f3944b1aa58ac36",
-  measurementId: "G-EQK0WQWQ33"
-};
+  // State to hold user data
+  const [userData, setUserData] = React.useState(null);
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-export default function UserPage({ userData, error }) {
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  // Fetch user data based on username
+  React.useEffect(() => {
+    if (username) {
+      const fetchUserData = async () => {
+        const userDocRef = doc(db, 'users', username);
+        const userSnapshot = await getDoc(userDocRef);
+        if (userSnapshot.exists()) {
+          setUserData(userSnapshot.data());
+        }
+      };
+      fetchUserData();
+    }
+  }, [username]);
 
   if (!userData) {
-    return <div>Loading...</div>;
+    return <p>Loading...</p>; // Show loading while fetching user data
   }
 
   return (
     <div>
-      <h1>User Profile: {userData.username}</h1>
-      <p>Account Created On: {new Date(userData.createdAt).toLocaleString()}</p>
-      {/* Display other user details here */}
+      <h1>{userData.username}'s Profile</h1>
+      <p>Account created on: {userData.createdAt}</p> {/* Assuming createdAt is part of user data */}
+      {/* Add more user profile details as needed */}
     </div>
   );
-}
+};
 
-export async function getServerSideProps({ params }) {
-  const { username } = params;  // Get username from the URL
-
-  try {
-    // Fetch the user data from Firestore
-    const userDoc = await getDoc(doc(db, 'users', username));
-
-    if (!userDoc.exists()) {
-      return { props: { error: 'User not found' } };
-    }
-
-    const userData = userDoc.data();
-    return {
-      props: { userData }
-    };
-  } catch (error) {
-    return {
-      props: { error: 'Failed to fetch user data' }
-    };
-  }
-}
+export default UserProfile;
