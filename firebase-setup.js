@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -17,41 +17,42 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-const database = getDatabase(app);
+const db = getFirestore(app);
 
-window.submitComment = function() {
-  const name = document.getElementById('name').value;
-  const comment = document.getElementById('comment').value;
+window.submitComment = async function() {
+  const name = document.getElementById('name').value || "Anonymous";
+  const comment = document.getElementById('comment').value || "No comment provided";
 
-  if(name && comment) {
-    const commentsRef = ref(database, 'comments');
-    const newCommentRef = push(commentsRef);
-    newCommentRef.set({
+  try {
+    const docRef = await addDoc(collection(db, "comments"), {
       name: name,
       comment: comment
-    }).then(() => {
-      document.getElementById('name').value = '';
-      document.getElementById('comment').value = '';
-    }).catch((error) => {
-      console.error("Error adding comment: ", error);
     });
+    console.log("Document written with ID: ", docRef.id);
+    document.getElementById('name').value = '';
+    document.getElementById('comment').value = '';
+  } catch (e) {
+    console.error("Error adding document: ", e);
   }
 };
 
-window.loadComments = function() {
-  const commentsRef = ref(database, 'comments');
-  onValue(commentsRef, (snapshot) => {
-    const commentsContainer = document.getElementById('comments-container');
-    commentsContainer.innerHTML = '';
-    snapshot.forEach((childSnapshot) => {
-      const childData = childSnapshot.val();
+window.loadComments = async function() {
+  const commentsContainer = document.getElementById('comments-container');
+  commentsContainer.innerHTML = '';
+  
+  try {
+    const querySnapshot = await getDocs(collection(db, "comments"));
+    querySnapshot.forEach((doc) => {
+      const commentData = doc.data();
       const commentElement = document.createElement('p');
-      commentElement.textContent = `${childData.name}: ${childData.comment}`;
+      commentElement.textContent = `${commentData.name}: ${commentData.comment}`;
       commentsContainer.appendChild(commentElement);
     });
-  });
+  } catch (e) {
+    console.error("Error loading comments: ", e);
+  }
 };
 
 window.onload = function() {
   loadComments();
-}
+};
