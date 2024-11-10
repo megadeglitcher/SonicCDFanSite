@@ -148,7 +148,7 @@ window.loadComments = function() {
       commentTimestamp.style.fontSize = 'small';
       commentTimestamp.style.fontStyle = 'italic';
       commentTimestamp.style.color = 'rgba(0, 0, 0, 0.6)';
-      commentTimestamp.style.marginTop = '-5px';
+      commentTimestamp.style.marginTop = '-10px';
 
       commentElement.appendChild(commentText);
       commentElement.appendChild(commentTimestamp);
