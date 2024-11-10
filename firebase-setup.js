@@ -36,6 +36,12 @@ async function registerUser() {
   const email = document.getElementById('register-email').value;
   const password = document.getElementById('register-password').value;
 
+  // Validate password length
+  if (password.length < 6) {
+    displayMessage('register-error-message', 'Password should be at least 6 characters!');
+    return;
+  }
+
   // Check if any input is empty or undefined
   if (!username || !email || !password) {
     displayMessage('register-error-message', 'Please provide username, email, and password!');
@@ -154,16 +160,11 @@ function loadComments() {
       commentTimestamp.textContent = new Date(commentData.createdAt).toLocaleString();
       commentTimestamp.style.fontSize = 'small';
       commentTimestamp.style.fontStyle = 'italic';
-      commentTimestamp.style.color = 'rgba(0, 0, 0, 0.6)';
-      commentTimestamp.style.marginTop = '-10px';
+      commentTimestamp.style.color = 'gray';
+
       commentElement.appendChild(commentText);
       commentElement.appendChild(commentTimestamp);
       commentsContainer.appendChild(commentElement);
     });
   });
 }
-
-window.onload = function() {
-  loadComments();  // Load comments on page load
-};
-
