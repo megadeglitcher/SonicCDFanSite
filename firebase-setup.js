@@ -113,6 +113,16 @@ window.loadComments = function() {
   });
 };
 
+document.getElementById('comment').addEventListener('keydown', function(event) {
+  if (event.key === 'Enter' && !event.altKey) {
+    event.preventDefault();
+    submitComment();
+  } else if (event.key === 'Enter' && event.altKey) {
+    event.preventDefault();
+    this.value += '\n';
+  }
+});
+
 window.onload = function() {
   loadComments();
 };
