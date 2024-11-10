@@ -125,6 +125,20 @@ function formatTimestamp(timestamp) {
   return `${dateFormatted} ~ ${timeFormatted}`;
 }
 
+// Helper function to generate rainbow colors for a string
+function rainbowText(text, reverse = false) {
+  const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
+  if (reverse) colors.reverse();
+  const span = document.createElement('span');
+  for (let i = 0; i < text.length; i++) {
+    const charSpan = document.createElement('span');
+    charSpan.style.color = colors[i % colors.length];
+    charSpan.textContent = text[i];
+    span.appendChild(charSpan);
+  }
+  return span;
+}
+
 window.loadComments = function() {
   const commentsRef = collection(db, "comments");
   const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
@@ -137,32 +151,30 @@ window.loadComments = function() {
       const commentText = document.createElement('p');
       const commentTimestamp = document.createElement('p');
 
-      const commentParts = commentData.comment.split('\n').map(part => document.createTextNode(part));
-
-      // Apply rainbow text color for SDG's comments
-      if (commentData.name === 'SDG') {
-        const rainbowColors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
-        commentParts.forEach((part, index) => {
-          const span = document.createElement('span');
-          span.style.color = rainbowColors[index % rainbowColors.length];
-          span.textContent = part.nodeValue;
-          commentText.appendChild(span);
-          commentText.appendChild(document.createElement('br'));
-        });
-      } else {
-        commentText.textContent = `${commentData.name}: `;
+      // Check if the comment is from the user "SDG"
+      if (commentData.name === "SDG") {
+        // Apply reverse rainbow effect on username
+        commentText.appendChild(rainbowText(`${commentData.name}: `, true));
+        
+        // Apply normal rainbow effect on the comment text
+        const commentParts = commentData.comment.split('\n').map(part => rainbowText(part));
         commentParts.forEach(part => {
           commentText.appendChild(part);
           commentText.appendChild(document.createElement('br'));
         });
+      } else {
+        // Regular style for other users
+        commentText.textContent = `${commentData.name}: ${commentData.comment}`;
       }
 
+      // Timestamp formatting
       commentTimestamp.textContent = formatTimestamp(commentData.createdAt);
       commentTimestamp.style.fontSize = 'small';
       commentTimestamp.style.fontStyle = 'italic';
       commentTimestamp.style.color = 'rgba(0, 0, 0, 0.6)';
       commentTimestamp.style.marginTop = '-10px';
 
+      // Append elements to the comment container
       commentElement.appendChild(commentText);
       commentElement.appendChild(commentTimestamp);
       commentsContainer.prepend(commentElement);  // Use prepend to place newest comments at the top
