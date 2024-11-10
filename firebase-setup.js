@@ -157,7 +157,14 @@ window.loadComments = function() {
         });
 
         // Add a black outline around the comment text
-        commentText.style.textShadow = '2px 2px 0px black';
+        commentText.style.textShadow = '1px 1px 0px black';
+        commentText.style.textShadow = '-1px -1px 0px black';
+        commentText.style.textShadow = '1px 0px 0px black';
+        commentText.style.textShadow = '0px 1px 0px black';
+        commentText.style.textShadow = '-1px 0px 0px black';
+        commentText.style.textShadow = '0px -1px 0px black';
+        commentText.style.textShadow = '1px -1px 0px black';
+        commentText.style.textShadow = '-1px 1px 0px black';
       } else {
         // Regular style for other users
         commentText.textContent = `${commentData.name}: ${commentData.comment}`;
