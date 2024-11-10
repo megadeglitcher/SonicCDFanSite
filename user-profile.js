@@ -2,6 +2,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
+console.log("JavaScript file loaded correctly");  // Debugging statement
+
 // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCrxSA-Y5FjKCkULoQ3iwCiKaupZOSK9FU",
@@ -17,18 +19,21 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Function to update title and display user profile
 async function displayUserProfile() {
+  console.log("displayUserProfile function started");  // Debugging statement
+
   const hash = window.location.hash;
   const parts = hash.split('/');
 
   // Validate the URL hash format
   if (parts.length < 3 || parts[1].toLowerCase() !== 'user') {
     document.getElementById('error-message').textContent = 'Invalid URL format. Expected: /user-profile.html#/User/{username}';
+    console.error("Invalid URL format");  // Debugging statement
     return;
   }
 
-  const username = parts[2];  // Extract username (the part after "/User/")
+  const username = parts[2];  // Extract username from the URL hash
+  console.log("Username from URL:", username);  // Debugging statement
   
   if (!username) {
     document.getElementById('error-message').textContent = 'Username is required in the URL.';
@@ -44,6 +49,7 @@ async function displayUserProfile() {
     
     if (!userDoc.exists()) {
       document.getElementById('error-message').textContent = `User "${username}" not found.`;
+      console.error(`User "${username}" not found in Firestore`);  // Debugging statement
       return;
     }
 
@@ -51,10 +57,11 @@ async function displayUserProfile() {
     const userData = userDoc.data();
     document.getElementById('username').textContent = userData.username;
     document.getElementById('created-at').textContent = new Date(userData.createdAt).toLocaleString();
+    console.log("User data fetched and displayed successfully");  // Debugging statement
 
   } catch (e) {
     document.getElementById('error-message').textContent = 'Error fetching user data.';
-    console.error('Firestore fetch error:', e);
+    console.error('Firestore fetch error:', e);  // Debugging statement
   }
 }
 
