@@ -46,6 +46,9 @@ async function displayUserProfile() {
     const userData = userDoc.data();
     document.getElementById('username').textContent = userData.username;
     document.getElementById('created-at').textContent = new Date(userData.createdAt).toLocaleString();
+
+    // Set the title to the username
+    document.title = `${userData.username}`;
   } catch (e) {
     document.getElementById('error-message').textContent = 'Error fetching user data.';
   }
