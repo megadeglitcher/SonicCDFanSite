@@ -1,38 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login/Register and Comment Section</title>
-  <script type="module" src="firebase-setup.js"></script> <!-- Include Firebase setup script -->
+  <script type="module" src="firebase-setup.js"></script>
 </head>
 <body>
   <h1>Login/Register</h1>
   
-  <!-- Registration Form -->
   <div>
     <h2>Register</h2>
-    <input type="text" id="register-username" placeholder="Username" required>
-    <input type="email" id="register-email" placeholder="Email" required>
-    <input type="password" id="register-password" placeholder="Password" required>
+    <input type="text" id="register-username" placeholder="Username">
+    <input type="email" id="register-email" placeholder="Email">
+    <input type="password" id="register-password" placeholder="Password">
     <button onclick="registerUser()">Register</button>
     <p id="register-error-message" style="color: red;"></p>
   </div>
   
-  <!-- Login Form -->
   <div>
     <h2>Login</h2>
-    <input type="email" id="login-email" placeholder="Email" required>
-    <input type="password" id="login-password" placeholder="Password" required>
+    <input type="email" id="login-email" placeholder="Email">
+    <input type="password" id="login-password" placeholder="Password">
     <button onclick="loginUser()">Login</button>
     <p id="login-error-message" style="color: red;"></p>
   </div>
 
-  <!-- Comment Section -->
-  <h1>Comment Section</h1>
-  <div id="comment-section">
+  <h1>Comment Section!</h1>
+  <div id="comment-section" style="display:none;">
     <textarea id="comment" placeholder="Write your comment here"></textarea>
     <button onclick="submitComment()">Submit</button>
   </div>
-  <button onclick="logOff()">Log Off</button>
+  
+  <button onclick="logOff()" style="display:none;" id="logoff-button">Log Off</button>
 
   <div id="comments-container">
     <!-- Comments will be loaded here -->
