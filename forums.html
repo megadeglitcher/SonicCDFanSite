@@ -3,37 +3,66 @@
 <head>
   <title>Login/Register and Comment Section</title>
   <script type="module" src="firebase-setup.js"></script>
+  <script>
+    // This function will get the logged-in user from cookies (you may need to adjust this)
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    // Your other Firebase and user functions (registerUser, loginUser, submitComment, logOff) should go here
+
+    window.onload = function() {
+      const loggedInUser = getCookie("loggedInUser");
+
+      // Show or hide elements based on the login status
+      if (loggedInUser) {
+        document.getElementById("comment-section").style.display = "block";
+        document.getElementById("login-register-section").style.display = "none";
+      } else {
+        document.getElementById("comment-section").style.display = "none";
+        document.getElementById("login-register-section").style.display = "block";
+      }
+    };
+
+    // Implement other functions like registerUser, loginUser, submitComment, logOff, etc.
+  </script>
 </head>
 <body>
-  <h1>Login/Register</h1>
-  
-  if (!loggedInUser) {
-  <div>
-    <h2>Register</h2>
-    <input type="text" id="register-username" placeholder="Username">
-    <input type="password" id="register-password" placeholder="Password">
-    <button onclick="registerUser(document.getElementById('register-username').value, document.getElementById('register-password').value)">Register</button>
-    <p id="register-error-message" style="color: red;"></p>
-  </div>
-  
-  <div>
-    <h2>Login</h2>
-    <input type="text" id="login-username" placeholder="Username">
-    <input type="password" id="login-password" placeholder="Password">
-    <button onclick="loginUser(document.getElementById('login-username').value, document.getElementById('login-password').value)">Login</button>
-    <p id="login-error-message" style="color: red;"></p>
-  </div>
-  }
 
-  <h1>Comment Section!</h1>
-  <div>
-    <textarea id="comment" placeholder="Write your comment here"></textarea>
-    <button onclick="submitComment()">Submit</button>
-  </div>
-  <button onclick="logOff()">Log Off</button>
+  <div id="login-register-section">
+    <h1>Login/Register</h1>
+    
+    <div>
+      <h2>Register</h2>
+      <input type="text" id="register-username" placeholder="Username">
+      <input type="password" id="register-password" placeholder="Password">
+      <button onclick="registerUser(document.getElementById('register-username').value, document.getElementById('register-password').value)">Register</button>
+      <p id="register-error-message" style="color: red;"></p>
+    </div>
 
-  <div id="comments-container">
-    <!-- Comments will be loaded here -->
+    <div>
+      <h2>Login</h2>
+      <input type="text" id="login-username" placeholder="Username">
+      <input type="password" id="login-password" placeholder="Password">
+      <button onclick="loginUser(document.getElementById('login-username').value, document.getElementById('login-password').value)">Login</button>
+      <p id="login-error-message" style="color: red;"></p>
+    </div>
   </div>
+
+  <div id="comment-section">
+    <h1>Comment Section!</h1>
+    <div>
+      <textarea id="comment" placeholder="Write your comment here"></textarea>
+      <button onclick="submitComment()">Submit</button>
+    </div>
+    <button onclick="logOff()">Log Off</button>
+
+    <div id="comments-container">
+      <!-- Comments will be loaded here -->
+    </div>
+  </div>
+
 </body>
 </html>
