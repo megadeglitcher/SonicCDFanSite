@@ -235,8 +235,8 @@ window.changePassword = async function(username, currentPassword, newPassword) {
       return;
     }
 
-    // Update password
-    await setDoc(doc(db, "users", username), { ...userData, password: newPassword });
+    // Update password without overwriting other user data
+    await setDoc(doc(db, "users", username), { ...userData, password: newPassword }, { merge: true });
     alert('Password changed successfully!');
   } catch (e) {
     alert('Error changing password.');
