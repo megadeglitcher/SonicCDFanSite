@@ -129,6 +129,21 @@ window.submitComment = async function() {
   }
 };
 
+// Add this function to handle the log off functionality
+window.logOff = function() {
+  eraseCookie("loggedInUser");  // Clear the cookie
+  loggedInUser = null;  // Reset logged-in user in JavaScript
+
+  displayMessage('login-error-message', 'You have been logged out.', false);
+
+  // Reload the comments to show the state after logging out
+  loadComments();
+
+  // Optionally, update the UI to show login buttons and hide comment form
+  document.getElementById('comment-section').style.display = 'none';
+  document.getElementById('login-section').style.display = 'block';
+};
+
 function loadComments() {
   const commentsRef = collection(db, "comments");
   const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
