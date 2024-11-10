@@ -39,7 +39,7 @@
 
 		const loggedInUser = getCookie("loggedInUser");
 
-		if (!loggedInUser) {
+		if (loggedInUser) {
 			<button onclick="logOff()">Log Off</button>
 		}
     </script>
