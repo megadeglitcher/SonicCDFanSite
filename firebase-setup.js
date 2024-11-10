@@ -139,11 +139,9 @@ window.logOff = function() {
   // Reload the comments to show the state after logging out
   loadComments();
 
-  // Show login and register sections and hide logoff section
-  document.getElementById('login-section').style.display = 'block';
-  document.getElementById('register-section').style.display = 'block';
-  document.getElementById('logoff-section').style.display = 'none';
+  // Optionally, update the UI to show login buttons and hide comment form
   document.getElementById('comment-section').style.display = 'none';
+  document.getElementById('login-section').style.display = 'block';
 };
 
 function loadComments() {
@@ -192,25 +190,7 @@ function loadComments() {
   });
 }
 
-// Initialize page behavior when loaded
 window.onload = function() {
-  // Check if a user is logged in by checking the cookie
-  if (loggedInUser) {
-    // User is logged in - hide register/login sections and show logoff section
-    document.getElementById('login-section').style.display = 'none';
-    document.getElementById('register-section').style.display = 'none';
-    document.getElementById('logoff-section').style.display = 'block';
-    document.getElementById('comment-section').style.display = 'block';
-
-    document.getElementById('logged-in-user').textContent = `Logged in as: ${loggedInUser}`;
-  } else {
-    // If no user is logged in, show the registration form and login section
-    document.getElementById('login-section').style.display = 'block';
-    document.getElementById('register-section').style.display = 'block';
-    document.getElementById('logoff-section').style.display = 'none';
-    document.getElementById('comment-section').style.display = 'none';
-  }
-
   loadComments();  // Load comments on page load
 };
 
