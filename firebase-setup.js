@@ -1,4 +1,4 @@
-// Import the necessary Firebase functions
+// Import necessary Firebase functions
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
@@ -44,6 +44,7 @@ function eraseCookie(name) {
 // Check if the user is logged in by checking cookies
 let loggedInUser = getCookie("loggedInUser");
 
+// Function to display messages (success or error)
 function displayMessage(elementId, message, isError = true) {
   const element = document.getElementById(elementId);
   element.textContent = message;
@@ -53,6 +54,15 @@ function displayMessage(elementId, message, isError = true) {
   }, 5000);
 }
 
+// Function to pre-fill login form with cookie if available
+function preFillLoginForm() {
+  const loginUsername = getCookie("loggedInUser");
+  if (loginUsername) {
+    document.getElementById('login-username').value = loginUsername;
+  }
+}
+
+// Register User
 async function registerUser(username, password) {
   username = username.trim();
   if (!username) {
@@ -73,6 +83,7 @@ async function registerUser(username, password) {
   }
 }
 
+// Login User
 async function loginUser(username, password) {
   username = username.trim();
   if (!username) {
@@ -100,9 +111,7 @@ async function loginUser(username, password) {
   }
 }
 
-window.registerUser = registerUser;
-window.loginUser = loginUser;
-
+// Submit Comment
 window.submitComment = async function() {
   if (!loggedInUser) {
     alert('You need to be logged in to do that.');
@@ -129,6 +138,7 @@ window.submitComment = async function() {
   }
 };
 
+// Load Comments
 function loadComments() {
   const commentsRef = collection(db, "comments");
   const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
@@ -176,9 +186,11 @@ function loadComments() {
 }
 
 window.onload = function() {
+  preFillLoginForm();  // Pre-fill login form if cookies exist
   loadComments();  // Load comments on page load
 };
 
+// Rainbow Text Effect
 function rainbowText(text, reverse = false) {
   const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
   if (reverse) colors.reverse();
@@ -192,6 +204,7 @@ function rainbowText(text, reverse = false) {
   return span;
 }
 
+// Apply Outline Style
 function applyOutlineStyle(element) {
   // Apply webkit text stroke (real outline effect)
   element.style.webkitTextStroke = '0.5px black'; // Black outline
