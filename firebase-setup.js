@@ -1,9 +1,9 @@
-// Import the functions you need from the SDKs you need
+// Import Firebase SDKs
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
 import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-// Your web app's Firebase configuration
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCrxSA-Y5FjKCkULoQ3iwCiKaupZOSK9FU",
   authDomain: "soniccdfansite.firebaseapp.com",
@@ -125,20 +125,6 @@ function formatTimestamp(timestamp) {
   return `${dateFormatted} ~ ${timeFormatted}`;
 }
 
-// Helper function to generate rainbow colors for a string
-function rainbowText(text, reverse = false) {
-  const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
-  if (reverse) colors.reverse();
-  const span = document.createElement('span');
-  for (let i = 0; i < text.length; i++) {
-    const charSpan = document.createElement('span');
-    charSpan.style.color = colors[i % colors.length];
-    charSpan.textContent = text[i];
-    span.appendChild(charSpan);
-  }
-  return span;
-}
-
 window.loadComments = function() {
   const commentsRef = collection(db, "comments");
   const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
@@ -153,17 +139,16 @@ window.loadComments = function() {
 
       // Check if the comment is from the user "SDG"
       if (commentData.name === "SDG") {
-        // Apply reverse rainbow effect on username
-        commentText.appendChild(rainbowText(`${commentData.name}: `, true));
+        const usernameSpan = document.createElement('span');
+        usernameSpan.className = 'reverse-rainbow-text';
+        usernameSpan.textContent = `${commentData.name}: `;
+        commentText.appendChild(usernameSpan);
         
-        // Apply normal rainbow effect on the comment text
-        const commentParts = commentData.comment.split('\n').map(part => rainbowText(part));
-        commentParts.forEach(part => {
-          commentText.appendChild(part);
-          commentText.appendChild(document.createElement('br'));
-        });
+        const commentSpan = document.createElement('span');
+        commentSpan.className = 'rainbow-text';
+        commentSpan.textContent = commentData.comment;
+        commentText.appendChild(commentSpan);
       } else {
-        // Regular style for other users
         commentText.textContent = `${commentData.name}: ${commentData.comment}`;
       }
 
@@ -177,7 +162,7 @@ window.loadComments = function() {
       // Append elements to the comment container
       commentElement.appendChild(commentText);
       commentElement.appendChild(commentTimestamp);
-      commentsContainer.prepend(commentElement);  // Use prepend to place newest comments at the top
+      commentsContainer.prepend(commentElement);
     });
   });
 };
