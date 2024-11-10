@@ -16,7 +16,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Function to display user profile
+// Function to display user profile and set the page title
 async function displayUserProfile() {
   // Extract the username from the URL hash (e.g., #/User/SDG)
   const hash = window.location.hash;
@@ -47,8 +47,9 @@ async function displayUserProfile() {
     document.getElementById('username').textContent = userData.username;
     document.getElementById('created-at').textContent = new Date(userData.createdAt).toLocaleString();
 
-    // Set the title to the username
-    document.title = `${userData.username}`;
+    // Dynamically set the page title to "User Profile - {username}"
+    document.title = `User Profile - ${userData.username}`;
+
   } catch (e) {
     document.getElementById('error-message').textContent = 'Error fetching user data.';
   }
