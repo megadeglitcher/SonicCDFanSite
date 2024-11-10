@@ -138,11 +138,38 @@ window.loadComments = function() {
       const commentTimestamp = document.createElement('p');
 
       const commentParts = commentData.comment.split('\n').map(part => document.createTextNode(part));
-      commentText.textContent = `${commentData.name}: `;
-      commentParts.forEach(part => {
-        commentText.appendChild(part);
-        commentText.appendChild(document.createElement('br'));
-      });
+
+      // Apply rainbow text color for SDG's comments
+      if (commentData.name === 'SDG') {
+        const rainbowColors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
+        commentText.innerHTML = `${commentData.name}: `;
+        commentParts.forEach((part, index) => {
+          const span = document.createElement('span');
+          span.style.color = rainbowColors[index % rainbowColors.length];
+          span.textContent = part.nodeValue;
+          commentText.appendChild(span);
+          commentText.appendChild(document.createElement('br'));
+        });
+      } else {
+        commentText.textContent = `${commentData.name}: `;
+        commentParts.forEach(part => {
+          commentText.appendChild(part);
+          commentText.appendChild(document.createElement('br'));
+        });
+      }
+
+      // Apply reverse rainbow text color for SDG's username
+      if (commentData.name === 'SDG') {
+        const reverseRainbowColors = ['violet', 'indigo', 'blue', 'green', 'yellow', 'orange', 'red'];
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = commentData.name;
+        nameSpan.style.color = reverseRainbowColors[0];
+        commentText.innerHTML = '';
+        commentText.appendChild(nameSpan);
+        commentText.appendChild(document.createTextNode(`: ${commentData.comment}`));
+      } else {
+        commentText.textContent = `${commentData.name}: `;
+      }
 
       commentTimestamp.textContent = formatTimestamp(commentData.createdAt);
       commentTimestamp.style.fontSize = 'small';
