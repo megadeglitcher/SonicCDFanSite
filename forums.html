@@ -1,15 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login/Register and Comment Section</title>
   <!-- Link to your JavaScript file -->
   <script type="module" src="firebase-setup.js"></script>
-  <style>
-    /* Solid black outline for SDG's text (both username and comment) */
-    .sdg-username, .sdg-comment {
-      text-shadow: 2px 2px 0 black, -2px -2px 0 black, 2px -2px 0 black, -2px 2px 0 black; /* Solid black outline */
-    }
-  </style>
 </head>
 <body>
   <h1>Login/Register</h1>
@@ -28,7 +24,7 @@
     <p id="login-error-message" style="color: red;"></p>
   </div>
 
-  <h1>Comment Section</h1>
+  <h1>Comment Section!</h1>
   <div>
     <textarea id="comment" placeholder="Comment"></textarea>
     <button onclick="submitComment()">Submit</button>
