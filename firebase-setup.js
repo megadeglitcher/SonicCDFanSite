@@ -1,6 +1,6 @@
-// Import Firebase functions
+// Import Firebase SDK
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, setDoc, doc, getDoc, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
 // Firebase configuration
@@ -19,7 +19,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Utility to display messages
+// Utility function to display messages
 function displayMessage(elementId, message, isError = true) {
   const element = document.getElementById(elementId);
   element.textContent = message;
@@ -29,22 +29,33 @@ function displayMessage(elementId, message, isError = true) {
   }, 5000);
 }
 
-// Register user
+// Register user function
 async function registerUser() {
-  const username = document.getElementById('register-username').value.trim();
-  const email = document.getElementById('register-email').value.trim();
-  const password = document.getElementById('register-password').value.trim();
+  const username = document.getElementById('register-username').value;
+  const email = document.getElementById('register-email').value;
+  const password = document.getElementById('register-password').value;
 
   console.log("Registering user...", username, email, password);
 
+  // Check if any input is empty or undefined
   if (!username || !email || !password) {
     displayMessage('register-error-message', 'Please provide username, email, and password!');
     return;
   }
 
+  // Trim the values after the check
+  const usernameTrimmed = username.trim();
+  const emailTrimmed = email.trim();
+  const passwordTrimmed = password.trim();
+
+  if (!usernameTrimmed || !emailTrimmed || !passwordTrimmed) {
+    displayMessage('register-error-message', 'Username, email, or password cannot be empty or just whitespace!');
+    return;
+  }
+
   try {
     // Create user with Firebase Authentication
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const userCredential = await createUserWithEmailAndPassword(auth, emailTrimmed, passwordTrimmed);
     console.log("User created:", userCredential);
 
     // After successful registration, store the username in Firestore
@@ -53,7 +64,7 @@ async function registerUser() {
 
     // Store the username and email in Firestore
     await setDoc(doc(db, "users", user.uid), { 
-      username, 
+      username: usernameTrimmed, 
       email: user.email, 
       createdAt 
     });
@@ -65,12 +76,10 @@ async function registerUser() {
   }
 }
 
-// Login user
+// Login user function
 async function loginUser() {
-  const email = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value.trim();
-
-  console.log("Logging in...", email, password);
+  const email = document.getElementById('login-username').value;
+  const password = document.getElementById('login-password').value;
 
   if (!email || !password) {
     displayMessage('login-error-message', 'Please provide email and password!');
@@ -79,35 +88,34 @@ async function loginUser() {
 
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-    console.log("User logged in:", user);
+    console.log("User logged in:", userCredential);
 
-    displayMessage('login-error-message', 'User logged in successfully!', false);
-    document.getElementById('comment-section').style.display = 'block';
-    document.getElementById('logoff-button').style.display = 'inline-block';
-
-    loadComments();  // Load comments after login
+    // User logged in, now fetch username from Firestore using user.uid
+    const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      console.log("User data:", userData);
+      displayMessage('login-error-message', `Welcome back, ${userData.username}!`, false);
+      loadComments();  // Load comments after login
+    } else {
+      displayMessage('login-error-message', 'User data not found!');
+    }
   } catch (e) {
-    console.log("Error during login:", e);
     displayMessage('login-error-message', 'Error logging in: ' + e.message);
   }
 }
 
-// Log off user
+// Log off function
 function logOff() {
-  console.log("Logging out...");
   signOut(auth).then(() => {
-    displayMessage('login-error-message', 'You have been logged out.', false);
-    document.getElementById('comment-section').style.display = 'none';
-    document.getElementById('logoff-button').style.display = 'none';
-    loadComments();  // Reload comments to reflect logged-out state
-  }).catch((e) => {
-    console.log("Error during logout:", e);
-    displayMessage('login-error-message', 'Error logging out: ' + e.message);
+    displayMessage('login-error-message', 'Logged out successfully!', false);
+    loadComments();  // Reload comments after logout
+  }).catch((error) => {
+    displayMessage('login-error-message', 'Error logging out: ' + error.message);
   });
 }
 
-// Submit comment
+// Submit comment function
 async function submitComment() {
   const comment = document.getElementById('comment').value.trim();
   if (!comment) {
@@ -115,24 +123,20 @@ async function submitComment() {
     return;
   }
 
-  const createdAt = new Date().toISOString();
-
+  const createdAt = new Date().toISOString();  // Store in UTC
   try {
     const docRef = await addDoc(collection(db, "comments"), {
       comment,
-      createdAt,
-      userId: auth.currentUser.uid  // Store the user ID along with the comment
+      createdAt
     });
-
-    console.log("Comment submitted:", docRef);
-    document.getElementById('comment').value = '';
+    document.getElementById('comment').value = '';  // Clear comment field
     loadComments();  // Reload comments after submission
   } catch (e) {
-    console.log("Error adding comment:", e);
+    console.error("Error adding comment:", e);
   }
 }
 
-// Load comments
+// Load comments from Firestore
 function loadComments() {
   const commentsRef = collection(db, "comments");
   const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
@@ -150,7 +154,6 @@ function loadComments() {
       commentTimestamp.style.fontStyle = 'italic';
       commentTimestamp.style.color = 'rgba(0, 0, 0, 0.6)';
       commentTimestamp.style.marginTop = '-10px';
-
       commentElement.appendChild(commentText);
       commentElement.appendChild(commentTimestamp);
       commentsContainer.appendChild(commentElement);
@@ -161,3 +164,4 @@ function loadComments() {
 window.onload = function() {
   loadComments();  // Load comments on page load
 };
+
