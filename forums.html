@@ -37,14 +37,11 @@
             return null;
         }
 
-        // Check login status on page load
-        window.onload = async function() {
-            const loggedInUser = getCookie("loggedInUser");
+		const loggedInUser = getCookie("loggedInUser");
 
-            if (!loggedInUser) {
-				<button onclick="logOff()">Log Off</button>
-            }
-        };
+		if (!loggedInUser) {
+			<button onclick="logOff()">Log Off</button>
+		}
     </script>
 </head>
 <body>
