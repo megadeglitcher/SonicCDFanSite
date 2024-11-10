@@ -142,7 +142,6 @@ window.loadComments = function() {
       // Apply rainbow text color for SDG's comments
       if (commentData.name === 'SDG') {
         const rainbowColors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
-        commentText.innerHTML = `${commentData.name}: `;
         commentParts.forEach((part, index) => {
           const span = document.createElement('span');
           span.style.color = rainbowColors[index % rainbowColors.length];
@@ -162,8 +161,8 @@ window.loadComments = function() {
       if (commentData.name === 'SDG') {
         const reverseRainbowColors = ['violet', 'indigo', 'blue', 'green', 'yellow', 'orange', 'red'];
         const nameSpan = document.createElement('span');
-        nameSpan.textContent = commentData.name;
         nameSpan.style.color = reverseRainbowColors[0];
+        nameSpan.textContent = commentData.name;
         commentText.innerHTML = '';
         commentText.appendChild(nameSpan);
         commentText.appendChild(document.createTextNode(`: ${commentData.comment}`));
