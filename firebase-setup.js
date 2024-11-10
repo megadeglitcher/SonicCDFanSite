@@ -147,15 +147,10 @@ window.loadComments = function() {
       // Check if the comment is from the user "SDG"
       if (commentData.name === "SDG") {
         // Apply reverse rainbow effect on username
-        const usernameSpan = rainbowText(`${commentData.name}: `, true);
-        commentText.appendChild(usernameSpan);
+        commentText.appendChild(rainbowText(`${commentData.name}: `, true));
         
-        // Apply rainbow effect on the comment text with an outline
-        const commentParts = commentData.comment.split('\n').map(part => {
-          const span = rainbowText(part);
-          span.classList.add('sdg-comment');  // Add class for comment outline
-          return span;
-        });
+        // Apply normal rainbow effect on the comment text
+        const commentParts = commentData.comment.split('\n').map(part => rainbowText(part));
         commentParts.forEach(part => {
           commentText.appendChild(part);
           commentText.appendChild(document.createElement('br'));
@@ -179,12 +174,3 @@ window.loadComments = function() {
     });
   });
 };
-
-document.getElementById('comment').addEventListener('keydown', function(event) {
-  if (event.key === 'Enter' && !event.altKey && !event.ctrlKey) {
-    event.preventDefault();
-    submitComment();
-  } else if ((event.key === 'Enter' && event.altKey) || (event.key === 'Enter' && event.ctrlKey)) {
-    // Allow for multi-line input when pressing Enter with Alt or Ctrl
-  }
-});
