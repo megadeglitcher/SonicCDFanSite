@@ -2,32 +2,8 @@
 <html>
 <head>
   <title>Login/Register and Comment Section</title>
-  
   <!-- Link to your JavaScript file -->
   <script type="module" src="firebase-setup.js"></script>
-
-  <style>
-    /* Smooth scrolling rainbow gradient animation */
-    @keyframes rainbowScroll {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 200% 50%; }
-    }
-
-    /* Rainbow text styles with smoother animation */
-    .rainbow-text, .reverse-rainbow-text {
-      background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
-      background-size: 400%;  /* Increased size for smoother transitions */
-      color: transparent;
-      -webkit-background-clip: text;
-      background-clip: text;
-      animation: rainbowScroll 10s linear infinite; /* Slowed down for smooth effect */
-      text-shadow: 1px 1px 2px black; /* Adds black outline */
-    }
-
-    .reverse-rainbow-text {
-      background: linear-gradient(270deg, violet, indigo, blue, green, yellow, orange, red);
-    }
-  </style>
 </head>
 <body>
   <h1>Login/Register</h1>
