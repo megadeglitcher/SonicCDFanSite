@@ -132,6 +132,12 @@ function rainbowText(text, reverse = false) {
   return span;
 }
 
+function applyOutlineStyle(element) {
+  // Apply webkit text stroke (real outline effect)
+  element.style.webkitTextStroke = '1px black'; // Black outline
+  element.style.textFillColor = 'white'; // Text color
+}
+
 window.loadComments = function() {
   const commentsRef = collection(db, "comments");
   const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
@@ -156,15 +162,8 @@ window.loadComments = function() {
           commentText.appendChild(document.createElement('br'));
         });
 
-        // Add a black outline around the comment text
-        commentText.style.textShadow = '1px 1px 0px black';
-        commentText.style.textShadow = '-1px -1px 0px black';
-        commentText.style.textShadow = '1px 0px 0px black';
-        commentText.style.textShadow = '0px 1px 0px black';
-        commentText.style.textShadow = '-1px 0px 0px black';
-        commentText.style.textShadow = '0px -1px 0px black';
-        commentText.style.textShadow = '1px -1px 0px black';
-        commentText.style.textShadow = '-1px 1px 0px black';
+        // Apply outline effect to SDG comment text
+        applyOutlineStyle(commentText);  // Add black outline
       } else {
         // Regular style for other users
         commentText.textContent = `${commentData.name}: ${commentData.comment}`;
