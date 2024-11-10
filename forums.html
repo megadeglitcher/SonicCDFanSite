@@ -12,17 +12,18 @@
     <input type="text" id="register-username" placeholder="Username">
     <input type="password" id="register-password" placeholder="Password">
     <button onclick="registerUser(document.getElementById('register-username').value, document.getElementById('register-password').value)">Register</button>
+    <p id="register-error-message" style="color: red;"></p>
   </div>
   <div>
     <h2>Login</h2>
     <input type="text" id="login-username" placeholder="Username">
     <input type="password" id="login-password" placeholder="Password">
     <button onclick="loginUser(document.getElementById('login-username').value, document.getElementById('login-password').value)">Login</button>
+    <p id="login-error-message" style="color: red;"></p>
   </div>
 
-  <h1>Comment Section!</h1>
+  <h1>Comment Section</h1>
   <div>
-    <input type="text" id="name" placeholder="Name" disabled>
     <textarea id="comment" placeholder="Comment"></textarea>
     <button onclick="submitComment()">Submit</button>
   </div>

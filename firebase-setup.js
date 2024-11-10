@@ -22,10 +22,12 @@ const db = getFirestore(app);
 let loggedInUser = null;
 
 async function registerUser(username, password) {
+  const errorMessageElement = document.getElementById('register-error-message');
+  errorMessageElement.textContent = '';
   try {
     const userDoc = await getDoc(doc(db, "users", username));
     if (userDoc.exists()) {
-      console.error("Username already exists!");
+      errorMessageElement.textContent = 'Username already in use!';
       return;
     }
     await setDoc(doc(db, "users", username), {
@@ -33,25 +35,28 @@ async function registerUser(username, password) {
       password: password
     });
     console.log("User registered successfully!");
+    errorMessageElement.textContent = 'User registered successfully!';
   } catch (e) {
     console.error("Error registering user: ", e);
   }
 }
 
 async function loginUser(username, password) {
+  const errorMessageElement = document.getElementById('login-error-message');
+  errorMessageElement.textContent = '';
   try {
     const userDoc = await getDoc(doc(db, "users", username));
     if (!userDoc.exists()) {
-      console.error("Username does not exist!");
+      errorMessageElement.textContent = 'Username does not exist!';
       return;
     }
     const userData = userDoc.data();
     if (userData.password === password) {
       console.log("User logged in successfully!");
-      loggedInUser = username;  // Store the logged-in user's username
-      // Handle successful login
+      loggedInUser = username;
+      errorMessageElement.textContent = 'User logged in successfully!';
     } else {
-      console.error("Incorrect password!");
+      errorMessageElement.textContent = 'Incorrect password!';
     }
   } catch (e) {
     console.error("Error logging in: ", e);
@@ -66,7 +71,11 @@ window.submitComment = async function() {
     console.error("User must be logged in to submit a comment");
     return;
   }
-  const comment = document.getElementById('comment').value || "No comment provided";
+  const comment = document.getElementById('comment').value.trim();
+  if (!comment) {
+    alert('Comment cannot be blank!');
+    return;
+  }
 
   try {
     const docRef = await addDoc(collection(db, "comments"), {
