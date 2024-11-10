@@ -19,6 +19,7 @@ const db = getFirestore(app);
 
 // Register user function
 window.registerUser = async function(username, password) {
+  // Check if username is valid
   username = username.trim();
   if (!username) {
     alert('Username cannot be empty or just whitespace!');
@@ -31,7 +32,7 @@ window.registerUser = async function(username, password) {
       alert('Username already in use!');
       return;
     }
-    const createdAt = new Date().toISOString();
+    const createdAt = new Date().toISOString();  // Get the current date and time
     await setDoc(doc(db, "users", username), { username, password, createdAt });
     alert('User registered successfully!');
   } catch (e) {
@@ -56,7 +57,7 @@ window.loginUser = async function(username, password) {
     const userData = userDoc.data();
     if (userData.password === password) {
       alert('User logged in successfully!');
-      loadComments();
+      loadComments();  // Load comments after login
     } else {
       alert('Incorrect password!');
     }
@@ -89,6 +90,7 @@ window.changePassword = async function(username, currentPassword, newPassword) {
       return;
     }
 
+    // Update password
     await setDoc(doc(db, "users", username), { ...userData, password: newPassword });
     alert('Password changed successfully!');
   } catch (e) {
@@ -96,27 +98,26 @@ window.changePassword = async function(username, currentPassword, newPassword) {
   }
 };
 
-// Comment functionality (submit and load comments)
+// Submit comment function
 window.submitComment = async function() {
-  // Check if user is logged in (you can implement a check using cookies or state)
   const comment = document.getElementById('comment').value.trim();
   if (!comment) {
-    alert('Comment cannot be blank!');
+    alert('Please write a comment.');
     return;
   }
 
-  const createdAt = new Date().toISOString();
+  const createdAt = new Date().toISOString();  // Store in UTC
 
   try {
-    await addDoc(collection(db, "comments"), {
-      name: "Logged In User",  // Use the logged-in username here
+    const docRef = await addDoc(collection(db, "comments"), {
+      name: "User",  // Replace with logged-in user's name
       comment,
       createdAt
     });
-    document.getElementById('comment').value = '';
-    loadComments();
+    document.getElementById('comment').value = '';  // Clear comment field
+    loadComments();  // Reload comments after submission
   } catch (e) {
-    console.error('Error adding comment:', e);
+    console.error("Error adding comment:", e);
   }
 };
 
@@ -126,21 +127,46 @@ function loadComments() {
   const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
   onSnapshot(commentsQuery, (snapshot) => {
     const commentsContainer = document.getElementById('comments-container');
-    commentsContainer.innerHTML = '';
+    commentsContainer.innerHTML = '';  // Clear existing comments
     snapshot.forEach((doc) => {
       const commentData = doc.data();
+
+      // Create a comment container
       const commentElement = document.createElement('div');
+      commentElement.classList.add('comment');
+
+      // Create the username element
+      const usernameElement = document.createElement('p');
+      if (commentData.name === "SDG") {
+        usernameElement.appendChild(rainbowText(commentData.name));  // Apply rainbow effect to SDG's name
+      } else {
+        usernameElement.textContent = commentData.name;  // Regular name for others
+      }
+      usernameElement.classList.add('username');
+
+      // Create the comment text
       const commentText = document.createElement('p');
-      commentText.textContent = `${commentData.name}: ${commentData.comment}`;
+      commentText.textContent = commentData.comment;
+
+      // Append username and comment text to the comment container
+      commentElement.appendChild(usernameElement);
       commentElement.appendChild(commentText);
+
+      // Append the comment to the container
       commentsContainer.appendChild(commentElement);
     });
   });
 }
 
-// Log out function
-window.logOff = function() {
-  alert('You have logged off!');
-  // Implement logout functionality (clear session or cookies if needed)
-};
-
+// Function to apply the rainbow effect to SDG's name
+function rainbowText(text) {
+  const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
+  const span = document.createElement('span');
+  for (let i = 0; i < text.length; i++) {
+    const charSpan = document.createElement('span');
+    charSpan.style.color = colors[i % colors.length];
+    charSpan.textContent = text[i];
+    span.appendChild(charSpan);
+  }
+  return span;
+}
