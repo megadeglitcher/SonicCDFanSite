@@ -98,16 +98,14 @@ window.submitComment = async function() {
     return;
   }
 
-  const createdAt = new Date();
-  const datePart = createdAt.toLocaleDateString('en-GB').replaceAll('/', '');
-  const timePart = createdAt.toLocaleTimeString('en-GB').replaceAll(':', '');
-  const timestamp = datePart + timePart;
+  // Get the current time in UTC
+  const createdAt = new Date().toISOString();  // UTC time in ISO format
 
   try {
     const docRef = await addDoc(collection(db, "comments"), {
       name: loggedInUser,
       comment: comment,
-      createdAt: timestamp
+      createdAt: createdAt // Store UTC time
     });
     console.log("Document written with ID: ", docRef.id);
     document.getElementById('comment').value = '';
@@ -118,11 +116,8 @@ window.submitComment = async function() {
 };
 
 function formatTimestamp(timestamp) {
-  const datePart = timestamp.slice(0, 8);
-  const timePart = timestamp.slice(8, 14);
-  const dateFormatted = `${datePart.slice(0, 2)}/${datePart.slice(2, 4)}/${datePart.slice(4, 8)}`;
-  const timeFormatted = `${timePart.slice(0, 2)}:${timePart.slice(2, 4)}:${timePart.slice(4, 6)}`;
-  return `${dateFormatted} ~ ${timeFormatted}`;
+  const date = new Date(timestamp); // Create a Date object from the UTC timestamp
+  return date.toLocaleString(); // Convert UTC time to local time string based on the user's timezone
 }
 
 // Helper function to generate rainbow colors for a string
@@ -153,9 +148,12 @@ window.loadComments = function() {
 
       // Check if the comment is from the user "SDG"
       if (commentData.name === "SDG") {
-        // Apply reverse rainbow effect on username
-        commentText.appendChild(rainbowText(`${commentData.name}: `, true));
-        
+        // Apply reverse rainbow effect on username with black outline
+        const sdgUsername = document.createElement('span');
+        sdgUsername.textContent = `${commentData.name}: `;
+        sdgUsername.classList.add('sdg-username');  // Apply outline class
+        commentText.appendChild(sdgUsername);
+
         // Apply normal rainbow effect on the comment text
         const commentParts = commentData.comment.split('\n').map(part => rainbowText(part));
         commentParts.forEach(part => {
@@ -167,7 +165,7 @@ window.loadComments = function() {
         commentText.textContent = `${commentData.name}: ${commentData.comment}`;
       }
 
-      // Timestamp formatting
+      // Timestamp formatting - convert UTC to local time
       commentTimestamp.textContent = formatTimestamp(commentData.createdAt);
       commentTimestamp.style.fontSize = 'small';
       commentTimestamp.style.fontStyle = 'italic';
