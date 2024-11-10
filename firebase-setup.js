@@ -122,6 +122,7 @@ window.loadComments = function() {
     snapshot.forEach((doc) => {
       const commentData = doc.data();
       const commentElement = document.createElement('div');
+      commentElement.style.marginBottom = '5px';
       const commentText = document.createElement('p');
       const commentTimestamp = document.createElement('p');
 
@@ -130,6 +131,7 @@ window.loadComments = function() {
       commentTimestamp.style.fontSize = 'small';
       commentTimestamp.style.fontStyle = 'italic';
       commentTimestamp.style.color = 'rgba(0, 0, 0, 0.6)';
+      commentTimestamp.style.marginTop = '2px';
 
       commentElement.appendChild(commentText);
       commentElement.appendChild(commentTimestamp);
