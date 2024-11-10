@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login/Register and Comment Section</title>
   <script type="module" src="firebase-setup.js"></script>
 </head>
@@ -23,12 +25,12 @@
     <p id="login-error-message" style="color: red;"></p>
   </div>
 
-  <h1>Comment Section!</h1>
+  <h1>Comment Section</h1>
   <div>
     <textarea id="comment" placeholder="Write your comment here"></textarea>
     <button onclick="submitComment()">Submit</button>
   </div>
-  <button onclick="logOff()">Log Off</button>
+  <button id="logoff-btn" onclick="logOff()" style="display:none;">Log Off</button>
 
   <div id="comments-container">
     <!-- Comments will be loaded here -->
