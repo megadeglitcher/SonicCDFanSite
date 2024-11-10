@@ -98,14 +98,13 @@ window.submitComment = async function() {
     return;
   }
 
-  // Get the current time in UTC
-  const createdAt = new Date().toISOString();  // UTC time in ISO format
+  const createdAt = new Date().toISOString();  // Store in UTC
 
   try {
     const docRef = await addDoc(collection(db, "comments"), {
       name: loggedInUser,
       comment: comment,
-      createdAt: createdAt // Store UTC time
+      createdAt: createdAt
     });
     console.log("Document written with ID: ", docRef.id);
     document.getElementById('comment').value = '';
@@ -116,11 +115,10 @@ window.submitComment = async function() {
 };
 
 function formatTimestamp(timestamp) {
-  const date = new Date(timestamp); // Create a Date object from the UTC timestamp
-  return date.toLocaleString(); // Convert UTC time to local time string based on the user's timezone
+  const date = new Date(timestamp);
+  return date.toLocaleString(); // Convert UTC to local time for display
 }
 
-// Helper function to generate rainbow colors for a string
 function rainbowText(text, reverse = false) {
   const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
   if (reverse) colors.reverse();
@@ -148,14 +146,16 @@ window.loadComments = function() {
 
       // Check if the comment is from the user "SDG"
       if (commentData.name === "SDG") {
-        // Apply reverse rainbow effect on username with black outline
-        const sdgUsername = document.createElement('span');
-        sdgUsername.textContent = `${commentData.name}: `;
-        sdgUsername.classList.add('sdg-username');  // Apply outline class
-        commentText.appendChild(sdgUsername);
-
-        // Apply normal rainbow effect on the comment text
-        const commentParts = commentData.comment.split('\n').map(part => rainbowText(part));
+        // Apply reverse rainbow effect on username
+        const usernameSpan = rainbowText(`${commentData.name}: `, true);
+        commentText.appendChild(usernameSpan);
+        
+        // Apply rainbow effect on the comment text with an outline
+        const commentParts = commentData.comment.split('\n').map(part => {
+          const span = rainbowText(part);
+          span.classList.add('sdg-comment');  // Add class for comment outline
+          return span;
+        });
         commentParts.forEach(part => {
           commentText.appendChild(part);
           commentText.appendChild(document.createElement('br'));
@@ -165,7 +165,7 @@ window.loadComments = function() {
         commentText.textContent = `${commentData.name}: ${commentData.comment}`;
       }
 
-      // Timestamp formatting - convert UTC to local time
+      // Timestamp formatting
       commentTimestamp.textContent = formatTimestamp(commentData.createdAt);
       commentTimestamp.style.fontSize = 'small';
       commentTimestamp.style.fontStyle = 'italic';
@@ -185,39 +185,6 @@ document.getElementById('comment').addEventListener('keydown', function(event) {
     event.preventDefault();
     submitComment();
   } else if ((event.key === 'Enter' && event.altKey) || (event.key === 'Enter' && event.ctrlKey)) {
-    event.preventDefault();
-    this.value += '\n';
+    // Allow for multi-line input when pressing Enter with Alt or Ctrl
   }
 });
-
-document.getElementById('login-username').addEventListener('keydown', function(event) {
-  if (event.key === 'Enter') {
-    event.preventDefault();
-    loginUser(document.getElementById('login-username').value, document.getElementById('login-password').value);
-  }
-});
-
-document.getElementById('login-password').addEventListener('keydown', function(event) {
-  if (event.key === 'Enter') {
-    event.preventDefault();
-    loginUser(document.getElementById('login-username').value, document.getElementById('login-password').value);
-  }
-});
-
-document.getElementById('register-username').addEventListener('keydown', function(event) {
-  if (event.key === 'Enter') {
-    event.preventDefault();
-    registerUser(document.getElementById('register-username').value, document.getElementById('register-password').value);
-  }
-});
-
-document.getElementById('register-password').addEventListener('keydown', function(event) {
-  if (event.key === 'Enter') {
-    event.preventDefault();
-    registerUser(document.getElementById('register-username').value, document.getElementById('register-password').value);
-  }
-});
-
-window.onload = function() {
-  loadComments();
-};

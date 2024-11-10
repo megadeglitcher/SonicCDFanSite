@@ -5,8 +5,8 @@
   <!-- Link to your JavaScript file -->
   <script type="module" src="firebase-setup.js"></script>
   <style>
-    /* Add black outline effect for SDG's text */
-    .sdg-username {
+    /* Add black outline effect for SDG's text (both username and comment) */
+    .sdg-username, .sdg-comment {
       text-shadow: 1px 1px 2px black, 0 0 25px red, 0 0 5px darkblue;
     }
   </style>
@@ -28,7 +28,7 @@
     <p id="login-error-message" style="color: red;"></p>
   </div>
 
-  <h1>Comment Section</h1>
+  <h1>Comment Section!</h1>
   <div>
     <textarea id="comment" placeholder="Comment"></textarea>
     <button onclick="submitComment()">Submit</button>
