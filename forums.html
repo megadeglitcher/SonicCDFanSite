@@ -4,33 +4,57 @@
   <title>Login/Register and Comment Section</title>
   <script type="module" src="firebase-setup.js"></script>
   <script>
-    // This function will get the logged-in user from cookies (you may need to adjust this)
+    // Function to get the cookie value by its name
     function getCookie(name) {
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${name}=`);
       if (parts.length === 2) return parts.pop().split(';').shift();
+      return null;
     }
 
-    // Your other Firebase and user functions (registerUser, loginUser, submitComment, logOff) should go here
-
+    // Check if the user is logged in (by checking the cookie)
     window.onload = function() {
       const loggedInUser = getCookie("loggedInUser");
 
-      // Show or hide elements based on the login status
       if (loggedInUser) {
+        // Show the comment section if the user is logged in
         document.getElementById("comment-section").style.display = "block";
         document.getElementById("login-register-section").style.display = "none";
       } else {
+        // Show the login/register section if the user is not logged in
         document.getElementById("comment-section").style.display = "none";
         document.getElementById("login-register-section").style.display = "block";
       }
     };
 
-    // Implement other functions like registerUser, loginUser, submitComment, logOff, etc.
+    // Implement functions for registerUser, loginUser, submitComment, and logOff
+    function registerUser(username, password) {
+      // Your registration logic here
+      console.log('User registered with:', username, password);
+    }
+
+    function loginUser(username, password) {
+      // Your login logic here
+      console.log('User logged in with:', username, password);
+      document.cookie = "loggedInUser=true; path=/"; // Set cookie when logged in
+      location.reload(); // Reload the page to check cookie again
+    }
+
+    function submitComment() {
+      // Handle comment submission
+      const comment = document.getElementById("comment").value;
+      console.log('Comment submitted:', comment);
+      // Optionally save the comment to a database or display it
+    }
+
+    function logOff() {
+      // Remove the logged-in user cookie to log out
+      document.cookie = "loggedInUser=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+      location.reload(); // Reload the page after logoff
+    }
   </script>
 </head>
 <body>
-
   <div id="login-register-section">
     <h1>Login/Register</h1>
     
@@ -51,7 +75,7 @@
     </div>
   </div>
 
-  <div id="comment-section">
+  <div id="comment-section" style="display: none;">
     <h1>Comment Section!</h1>
     <div>
       <textarea id="comment" placeholder="Write your comment here"></textarea>
@@ -63,6 +87,5 @@
       <!-- Comments will be loaded here -->
     </div>
   </div>
-
 </body>
 </html>
