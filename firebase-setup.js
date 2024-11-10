@@ -33,6 +33,12 @@ function displayMessage(elementId, message, isError = true) {
 }
 
 async function registerUser(username, password) {
+  username = username.trim();
+  if (!username) {
+    displayMessage('register-error-message', 'Username cannot be empty or just whitespace!');
+    return;
+  }
+
   try {
     const userDoc = await getDoc(doc(db, "users", username));
     if (userDoc.exists()) {
@@ -52,6 +58,12 @@ async function registerUser(username, password) {
 }
 
 async function loginUser(username, password) {
+  username = username.trim();
+  if (!username) {
+    displayMessage('login-error-message', 'Username cannot be empty or just whitespace!');
+    return;
+  }
+
   try {
     const userDoc = await getDoc(doc(db, "users", username));
     if (!userDoc.exists()) {
@@ -125,18 +137,12 @@ window.loadComments = function() {
       const commentText = document.createElement('p');
       const commentTimestamp = document.createElement('p');
 
-      const commentParts = commentData.comment.split('\n').map((part, index) => {
-        const span = document.createElement('span');
-        span.textContent = part;
-        if (index < commentParts.length - 1) {
-          span.appendChild(document.createElement('br'));
-        }
-        return span;
+      const commentParts = commentData.comment.split('\n').map(part => document.createTextNode(part));
+      commentText.textContent = `${commentData.name}: `;
+      commentParts.forEach(part => {
+        commentText.appendChild(part);
+        commentText.appendChild(document.createElement('br'));
       });
-
-      commentText.innerHTML = `<strong>${commentData.name}:</strong> `;
-      commentParts.forEach(part => commentText.appendChild(part));
-      commentText.style.marginBottom = '0px';
 
       commentTimestamp.textContent = formatTimestamp(commentData.createdAt);
       commentTimestamp.style.fontSize = 'small';
