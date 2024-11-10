@@ -28,10 +28,35 @@
     <textarea id="comment" placeholder="Write your comment here"></textarea>
     <button onclick="submitComment()">Submit</button>
   </div>
-  <button onclick="logOff()">Log Off</button>
+
+  <!-- Log Off Button, will only be visible if the user is logged in -->
+  <button id="logOffButton" style="display: none;" onclick="logOff()">Log Off</button>
 
   <div id="comments-container">
     <!-- Comments will be loaded here -->
   </div>
+
+  <script>
+    // Check if the user is logged in by checking the cookie
+    function getCookie(name) {
+      const nameEQ = name + "=";
+      const ca = document.cookie.split(';');
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i].trim();
+        if (c.indexOf(nameEQ) === 0) {
+          return c.substring(nameEQ.length, c.length);
+        }
+      }
+      return null;
+    }
+
+    // Show the Log Off button if the user is logged in
+    window.onload = function() {
+      const loggedInUser = getCookie("loggedInUser");
+      if (loggedInUser) {
+        document.getElementById('logOffButton').style.display = 'inline'; // Show Log Off button
+      }
+    };
+  </script>
 </body>
 </html>
