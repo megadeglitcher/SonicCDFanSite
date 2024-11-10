@@ -134,7 +134,7 @@ function rainbowText(text, reverse = false) {
 
 function applyOutlineStyle(element) {
   // Apply webkit text stroke (real outline effect)
-  element.style.webkitTextStroke = '1px black'; // Black outline
+  element.style.webkitTextStroke = '0.3px black'; // Black outline
   element.style.textFillColor = 'white'; // Text color
 }
 
