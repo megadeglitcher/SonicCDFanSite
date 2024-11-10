@@ -1,17 +1,14 @@
+<!-- user-profile.ejs -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Profile</title>
-  <script type="module" src="user-profile.js"></script> <!-- Link to the JavaScript file -->
+  <title>User Profile - <%= username %></title> <!-- Set title dynamically -->
 </head>
 <body>
   <h1>User Profile</h1>
-  <div id="user-profile">
-    <p><strong>Username:</strong> <span id="username"></span></p>
-    <p><strong>Account Created On:</strong> <span id="created-at"></span></p>
-  </div>
-  <div id="error-message" style="color: red;"></div>
+  <p><strong>Username:</strong> <%= username %></p>
+  <!-- Display other user data here -->
 </body>
 </html>
