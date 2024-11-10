@@ -1,52 +1,59 @@
 // pages/user/[username].js
 
-import { useEffect, useState } from 'react';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
 
-const UserProfile = ({ username }) => {
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCrxSA-Y5FjKCkULoQ3iwCiKaupZOSK9FU",
+  authDomain: "soniccdfansite.firebaseapp.com",
+  projectId: "soniccdfansite",
+  storageBucket: "soniccdfansite.firebasestorage.app",
+  messagingSenderId: "739250141699",
+  appId: "1:739250141699:web:1925788f3944b1aa58ac36",
+  measurementId: "G-EQK0WQWQ33"
+};
 
-  useEffect(() => {
-    // Fetch user data from the API route
-    fetch(`/api/${username}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('User not found');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setUserData(data);  // Set the user data in state
-        setLoading(false);   // Set loading to false
-      })
-      .catch((error) => {
-        console.error('Error fetching user data:', error);
-        setUserData(null);
-        setLoading(false);
-      });
-  }, [username]);
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-  // If the data is still loading, show a loading message
-  if (loading) {
-    return <div>Loading...</div>;
+export default function UserPage({ userData, error }) {
+  if (error) {
+    return <div>Error: {error}</div>;
   }
 
-  // If no user data is available, show an error message
   if (!userData) {
-    return <div>User not found.</div>;
+    return <div>Loading...</div>;
   }
 
   return (
     <div>
-      <h1>{userData.username}'s Profile</h1>
-      <p>Account created on: {userData.createdAt}</p>
+      <h1>User Profile: {userData.username}</h1>
+      <p>Account Created On: {new Date(userData.createdAt).toLocaleString()}</p>
+      {/* Display other user details here */}
     </div>
   );
-};
+}
 
-// This function will fetch the username from the URL params
-UserProfile.getInitialProps = ({ query }) => {
-  return { username: query.username };
-};
+export async function getServerSideProps({ params }) {
+  const { username } = params;  // Get username from the URL
 
-export default UserProfile;
+  try {
+    // Fetch the user data from Firestore
+    const userDoc = await getDoc(doc(db, 'users', username));
+
+    if (!userDoc.exists()) {
+      return { props: { error: 'User not found' } };
+    }
+
+    const userData = userDoc.data();
+    return {
+      props: { userData }
+    };
+  } catch (error) {
+    return {
+      props: { error: 'Failed to fetch user data' }
+    };
+  }
+}
