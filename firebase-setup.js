@@ -21,13 +21,20 @@ const db = getFirestore(app);
 
 let loggedInUser = null;
 
+function displayMessage(elementId, message, isError = true) {
+  const element = document.getElementById(elementId);
+  element.textContent = message;
+  element.style.color = isError ? 'red' : 'green';
+  setTimeout(() => {
+    element.textContent = '';
+  }, 5000);
+}
+
 async function registerUser(username, password) {
-  const errorMessageElement = document.getElementById('register-error-message');
-  errorMessageElement.textContent = '';
   try {
     const userDoc = await getDoc(doc(db, "users", username));
     if (userDoc.exists()) {
-      errorMessageElement.textContent = 'Username already in use!';
+      displayMessage('register-error-message', 'Username already in use!');
       return;
     }
     await setDoc(doc(db, "users", username), {
@@ -35,31 +42,31 @@ async function registerUser(username, password) {
       password: password
     });
     console.log("User registered successfully!");
-    errorMessageElement.textContent = 'User registered successfully!';
+    displayMessage('register-error-message', 'User registered successfully!', false);
   } catch (e) {
     console.error("Error registering user: ", e);
+    displayMessage('register-error-message', 'Error registering user.');
   }
 }
 
 async function loginUser(username, password) {
-  const errorMessageElement = document.getElementById('login-error-message');
-  errorMessageElement.textContent = '';
   try {
     const userDoc = await getDoc(doc(db, "users", username));
     if (!userDoc.exists()) {
-      errorMessageElement.textContent = 'Username does not exist!';
+      displayMessage('login-error-message', 'Username does not exist!');
       return;
     }
     const userData = userDoc.data();
     if (userData.password === password) {
       console.log("User logged in successfully!");
       loggedInUser = username;
-      errorMessageElement.textContent = 'User logged in successfully!';
+      displayMessage('login-error-message', 'User logged in successfully!', false);
     } else {
-      errorMessageElement.textContent = 'Incorrect password!';
+      displayMessage('login-error-message', 'Incorrect password!');
     }
   } catch (e) {
     console.error("Error logging in: ", e);
+    displayMessage('login-error-message', 'Error logging in.');
   }
 }
 
