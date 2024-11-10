@@ -2,11 +2,11 @@
 <html>
 <head>
   <title>Login/Register and Comment Section</title>
-  <!-- Link to your JavaScript file -->
   <script type="module" src="firebase-setup.js"></script>
 </head>
 <body>
   <h1>Login/Register</h1>
+  
   <div>
     <h2>Register</h2>
     <input type="text" id="register-username" placeholder="Username">
@@ -14,6 +14,7 @@
     <button onclick="registerUser(document.getElementById('register-username').value, document.getElementById('register-password').value)">Register</button>
     <p id="register-error-message" style="color: red;"></p>
   </div>
+  
   <div>
     <h2>Login</h2>
     <input type="text" id="login-username" placeholder="Username">
@@ -22,11 +23,12 @@
     <p id="login-error-message" style="color: red;"></p>
   </div>
 
-  <h1>Comment Section!</h1>
+  <h1>Comment Section</h1>
   <div>
-    <textarea id="comment" placeholder="Comment"></textarea>
+    <textarea id="comment" placeholder="Write your comment here"></textarea>
     <button onclick="submitComment()">Submit</button>
   </div>
+
   <div id="comments-container">
     <!-- Comments will be loaded here -->
   </div>
