@@ -77,7 +77,7 @@ window.loginUser = loginUser;
 
 window.submitComment = async function() {
   if (!loggedInUser) {
-    alert('need to be logged in to do that.');
+    alert('You need to be logged in to do that.');
     return;
   }
   const comment = document.getElementById('comment').value.trim();
@@ -108,14 +108,25 @@ window.loadComments = function() {
     commentsContainer.innerHTML = '';
     snapshot.forEach((doc) => {
       const commentData = doc.data();
-      const commentElement = document.createElement('p');
-      
+      const commentElement = document.createElement('div');
+
       // Convert the timestamp to the user's local time
       const createdAt = commentData.createdAt.toDate();
       const localDateString = createdAt.toLocaleDateString('en-GB');
       const localTimeString = createdAt.toLocaleTimeString('en-GB');
 
-      commentElement.textContent = `${commentData.name}: ${commentData.comment} (${localDateString} ~ ${localTimeString})`;
+      const timestampElement = document.createElement('p');
+      timestampElement.style.fontSize = '0.8em';
+      timestampElement.style.color = 'rgba(0, 0, 0, 0.6)';
+      timestampElement.style.fontStyle = 'italic';
+      timestampElement.textContent = `${localDateString} ~ ${localTimeString}`;
+
+      const messageElement = document.createElement('p');
+      messageElement.textContent = `${commentData.name}: ${commentData.comment}`;
+
+      commentElement.appendChild(messageElement);
+      commentElement.appendChild(timestampElement);
+
       commentsContainer.appendChild(commentElement);
     });
   });
@@ -159,6 +170,4 @@ document.getElementById('register-password').addEventListener('keydown', functio
   }
 });
 
-window.onload = function() {
-  loadComments();
-};
+window.onload = function
