@@ -35,6 +35,8 @@ async function registerUser() {
   const email = document.getElementById('register-email').value.trim();
   const password = document.getElementById('register-password').value.trim();
 
+  console.log("Registering user...", username, email, password);
+
   if (!username || !email || !password) {
     displayMessage('register-error-message', 'Please provide username, email, and password!');
     return;
@@ -43,6 +45,7 @@ async function registerUser() {
   try {
     // Create user with Firebase Authentication
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    console.log("User created:", userCredential);
 
     // After successful registration, store the username in Firestore
     const user = userCredential.user;
@@ -57,6 +60,7 @@ async function registerUser() {
 
     displayMessage('register-error-message', 'User registered successfully!', false);
   } catch (e) {
+    console.log("Error during registration:", e);
     displayMessage('register-error-message', 'Error registering user: ' + e.message);
   }
 }
@@ -66,6 +70,8 @@ async function loginUser() {
   const email = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value.trim();
 
+  console.log("Logging in...", email, password);
+
   if (!email || !password) {
     displayMessage('login-error-message', 'Please provide email and password!');
     return;
@@ -74,6 +80,7 @@ async function loginUser() {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
+    console.log("User logged in:", user);
 
     displayMessage('login-error-message', 'User logged in successfully!', false);
     document.getElementById('comment-section').style.display = 'block';
@@ -81,18 +88,21 @@ async function loginUser() {
 
     loadComments();  // Load comments after login
   } catch (e) {
+    console.log("Error during login:", e);
     displayMessage('login-error-message', 'Error logging in: ' + e.message);
   }
 }
 
 // Log off user
 function logOff() {
+  console.log("Logging out...");
   signOut(auth).then(() => {
     displayMessage('login-error-message', 'You have been logged out.', false);
     document.getElementById('comment-section').style.display = 'none';
     document.getElementById('logoff-button').style.display = 'none';
     loadComments();  // Reload comments to reflect logged-out state
   }).catch((e) => {
+    console.log("Error during logout:", e);
     displayMessage('login-error-message', 'Error logging out: ' + e.message);
   });
 }
@@ -114,10 +124,11 @@ async function submitComment() {
       userId: auth.currentUser.uid  // Store the user ID along with the comment
     });
 
+    console.log("Comment submitted:", docRef);
     document.getElementById('comment').value = '';
     loadComments();  // Reload comments after submission
   } catch (e) {
-    console.error("Error adding comment:", e);
+    console.log("Error adding comment:", e);
   }
 }
 
