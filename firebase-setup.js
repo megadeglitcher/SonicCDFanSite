@@ -26,7 +26,9 @@ function displayMessage(elementId, message, isError = true) {
   element.textContent = message;
   element.style.color = isError ? 'red' : 'green';
   setTimeout(() => {
-    element.textContent = '';
+    if (element.textContent === message) {
+      element.textContent = '';
+    }
   }, 5000);
 }
 
@@ -75,7 +77,7 @@ window.loginUser = loginUser;
 
 window.submitComment = async function() {
   if (!loggedInUser) {
-    console.error("User must be logged in to submit a comment");
+    alert('You need to be logged in to do that.');
     return;
   }
   const comment = document.getElementById('comment').value.trim();
@@ -123,6 +125,18 @@ document.getElementById('comment').addEventListener('keydown', function(event) {
   }
 });
 
-window.onload = function() {
-  loadComments();
-};
+document.getElementById('login-username').addEventListener('keydown', function(event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    loginUser(document.getElementById('login-username').value, document.getElementById('login-password').value);
+  }
+});
+
+document.getElementById('login-password').addEventListener('keydown', function(event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    loginUser(document.getElementById('login-username').value, document.getElementById('login-password').value);
+  }
+});
+
+document.getElement
