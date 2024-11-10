@@ -44,6 +44,7 @@ function eraseCookie(name) {
 // Check if the user is logged in by checking cookies
 let loggedInUser = getCookie("loggedInUser");
 
+// Function to display messages to the user (success or error)
 function displayMessage(elementId, message, isError = true) {
   const element = document.getElementById(elementId);
   element.textContent = message;
@@ -53,6 +54,7 @@ function displayMessage(elementId, message, isError = true) {
   }, 5000);
 }
 
+// Register user function
 async function registerUser(username, password) {
   username = username.trim();
   if (!username) {
@@ -73,6 +75,7 @@ async function registerUser(username, password) {
   }
 }
 
+// Login user function
 async function loginUser(username, password) {
   username = username.trim();
   if (!username) {
@@ -89,9 +92,10 @@ async function loginUser(username, password) {
     const userData = userDoc.data();
     if (userData.password === password) {
       loggedInUser = username;
-      setCookie("loggedInUser", username, 7);  // Set cookie for 7 days only during login
+      setCookie("loggedInUser", username, 7);  // Set cookie for 7 days
       displayMessage('login-error-message', 'User logged in successfully!', false);
-      loadComments();  // Load comments after login
+      loadComments();  // Load comments immediately after login
+      checkLoginState();  // Update UI after login
     } else {
       displayMessage('login-error-message', 'Incorrect password!');
     }
@@ -100,18 +104,13 @@ async function loginUser(username, password) {
   }
 }
 
-// Function to log off
+// Log off function
 function logOff() {
   eraseCookie("loggedInUser");  // Clear the logged-in user cookie
   loggedInUser = null;  // Clear the logged-in user variable
   displayMessage('login-error-message', 'You have been logged out.', false);  // Display logged-out message
-
-  // Optionally, you can also reset any UI elements or fields as needed
-  document.getElementById('login-username').value = '';
-  document.getElementById('login-password').value = '';
-
-  // Hide the comment section when logged out
-  document.getElementById('comment-section').style.display = 'none';
+  checkLoginState();  // Update UI after log off
+  loadComments();  // Reload comments after logging out (optional)
 }
 
 // Check if the user is logged in
@@ -119,9 +118,12 @@ function checkLoginState() {
   if (loggedInUser) {
     document.getElementById('comment-section').style.display = 'block';  // Show comment section
     document.getElementById('login-error-message').textContent = 'Welcome back, ' + loggedInUser + '!';
+    document.getElementById('login-form').style.display = 'none';  // Hide login form
+    document.getElementById('logoff-button').style.display = 'inline';  // Show log off button
   } else {
     document.getElementById('comment-section').style.display = 'none';  // Hide comment section
-    document.getElementById('login-error-message').textContent = '';
+    document.getElementById('login-form').style.display = 'block';  // Show login form
+    document.getElementById('logoff-button').style.display = 'none';  // Hide log off button
   }
 }
 
@@ -140,12 +142,12 @@ window.submitComment = async function() {
   const createdAt = new Date().toISOString();  // Store in UTC
 
   try {
-    const docRef = await addDoc(collection(db, "comments"), {
+    await addDoc(collection(db, "comments"), {
       name: loggedInUser,
       comment,
       createdAt
     });
-    document.getElementById('comment').value = '';
+    document.getElementById('comment').value = '';  // Clear the input field
     loadComments();  // Reload comments after submission
   } catch (e) {
     console.error("Error adding comment:", e);
@@ -169,7 +171,7 @@ function loadComments() {
       if (commentData.name === "SDG") {
         // Apply reverse rainbow effect on username
         commentText.appendChild(rainbowText(`${commentData.name}: `, true));
-        
+
         // Apply rainbow effect to the comment text
         const commentParts = commentData.comment.split('\n').map(part => rainbowText(part));
         commentParts.forEach(part => {
@@ -213,14 +215,14 @@ function rainbowText(text, reverse = false) {
   return span;
 }
 
+// Apply outline style to SDG's comment text
 function applyOutlineStyle(element) {
-  // Apply webkit text stroke (real outline effect)
   element.style.webkitTextStroke = '0.5px black'; // Black outline
   element.style.textFillColor = 'white'; // Text color
 }
 
-// Update the checkLoginState function to run when the page loads
+// On page load, check login state
 window.onload = function() {
-  checkLoginState();  // Check login state on page load
+  checkLoginState();  // Check if the user is logged in
   loadComments();  // Load comments on page load
 };
