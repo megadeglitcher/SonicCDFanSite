@@ -16,13 +16,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Function to display user profile and set the page title
+// Function to update the title and display user profile
 async function displayUserProfile() {
-  // Extract the username from the URL hash (e.g., #/User/SDG)
+  // Extract username from the URL hash (e.g., #/User/SDG)
   const hash = window.location.hash;
   const parts = hash.split('/');  // Split the hash string by "/"
   
-  // Ensure the hash follows the correct format "#/User/{username}"
   if (parts.length < 3 || parts[1] !== 'User') {
     document.getElementById('error-message').textContent = 'Invalid URL format. Expected: /user-profile.html#/User/{username}';
     return;
@@ -35,7 +34,10 @@ async function displayUserProfile() {
     return;
   }
 
-  // Fetch the user data from Firestore
+  // Set the page title dynamically
+  document.title = `User Profile - ${username}`;
+
+  // Fetch user data from Firestore
   try {
     const userDoc = await getDoc(doc(db, "users", username));
     if (!userDoc.exists()) {
@@ -47,13 +49,10 @@ async function displayUserProfile() {
     document.getElementById('username').textContent = userData.username;
     document.getElementById('created-at').textContent = new Date(userData.createdAt).toLocaleString();
 
-    // Dynamically set the page title to "User Profile - {username}"
-    document.title = `User Profile - ${userData.username}`;
-
   } catch (e) {
     document.getElementById('error-message').textContent = 'Error fetching user data.';
   }
 }
 
-// Run the function to display the profile when the page loads
+// Call the function to update title and load user profile when page loads
 window.onload = displayUserProfile;
