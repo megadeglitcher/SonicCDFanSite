@@ -130,7 +130,7 @@ window.loadComments = function() {
       commentTimestamp.style.fontSize = 'small';
       commentTimestamp.style.fontStyle = 'italic';
       commentTimestamp.style.color = 'rgba(0, 0, 0, 0.6)';
-      commentTimestamp.style.marginTop = '2px'; // Closer spacing to the message
+      commentTimestamp.style.marginTop = '5px';  // Adjust the margin to bring it closer
 
       commentElement.appendChild(commentText);
       commentElement.appendChild(commentTimestamp);
