@@ -77,7 +77,7 @@ window.loginUser = loginUser;
 
 window.submitComment = async function() {
   if (!loggedInUser) {
-    alert('You need to be logged in to do that.');
+    alert('need to be logged in to do that.');
     return;
   }
   const comment = document.getElementById('comment').value.trim();
@@ -109,7 +109,13 @@ window.loadComments = function() {
     snapshot.forEach((doc) => {
       const commentData = doc.data();
       const commentElement = document.createElement('p');
-      commentElement.textContent = `${commentData.name}: ${commentData.comment}`;
+      
+      // Convert the timestamp to the user's local time
+      const createdAt = commentData.createdAt.toDate();
+      const localDateString = createdAt.toLocaleDateString('en-GB');
+      const localTimeString = createdAt.toLocaleTimeString('en-GB');
+
+      commentElement.textContent = `${commentData.name}: ${commentData.comment} (${localDateString} - ${localTimeString})`;
       commentsContainer.appendChild(commentElement);
     });
   });
@@ -139,4 +145,20 @@ document.getElementById('login-password').addEventListener('keydown', function(e
   }
 });
 
-document.getElement
+document.getElementById('register-username').addEventListener('keydown', function(event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    registerUser(document.getElementById('register-username').value, document.getElementById('register-password').value);
+  }
+});
+
+document.getElementById('register-password').addEventListener('keydown', function(event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    registerUser(document.getElementById('register-username').value, document.getElementById('register-password').value);
+  }
+});
+
+window.onload = function() {
+  loadComments();
+};
