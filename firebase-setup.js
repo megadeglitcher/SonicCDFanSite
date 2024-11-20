@@ -182,10 +182,9 @@ function loadComments() {
         applyOutlineStyle(commentText); // Add black outline
       } else {
         // Regular style for other users
-        commentText.textContent = `${commentData.name}: ${commentData.comment}`;
+		commentText.textContent = `${commentData.name}: ${commentData.comment}`;
       }
 
-      commentText.textContent = `${commentData.name}: ${commentData.comment}`;
       commentTimestamp.textContent = new Date(commentData.createdAt).toLocaleString();
       commentTimestamp.style.fontSize = 'small';
       commentTimestamp.style.fontStyle = 'italic';
