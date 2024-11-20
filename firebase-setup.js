@@ -166,22 +166,26 @@ function loadComments() {
       const commentElement = document.createElement('div');
       const commentText = document.createElement('p');
       const commentTimestamp = document.createElement('p');
-
-      // Apply rainbow effect and outline if the user is "SDG"
+	  
+      // Check if the comment is from the user "SDG"
       if (commentData.name === "SDG") {
+        // Apply reverse rainbow effect on username
         commentText.appendChild(rainbowText(`${commentData.name}: `, true));
+        
+        // Apply rainbow effect to the comment text
         const commentParts = commentData.comment.split('\n').map(part => rainbowText(part));
         commentParts.forEach(part => {
           commentText.appendChild(part);
           commentText.appendChild(document.createElement('br'));
         });
-        applyOutlineStyle(commentText); // Apply black outline to SDG's text
+        // Apply outline effect to SDG comment text
+        applyOutlineStyle(commentText); // Add black outline
       } else {
         // Regular style for other users
         commentText.textContent = `${commentData.name}: ${commentData.comment}`;
       }
 
-      // Timestamp formatting
+      commentText.textContent = `${commentData.name}: ${commentData.comment}`;
       commentTimestamp.textContent = new Date(commentData.createdAt).toLocaleString();
       commentTimestamp.style.fontSize = 'small';
       commentTimestamp.style.fontStyle = 'italic';
@@ -196,10 +200,51 @@ function loadComments() {
   });
 }
 
+function rainbowText(text, reverse = false) {
+  const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
+  if (reverse) colors.reverse();
+  const span = document.createElement('span');
+  for (let i = 0; i < text.length; i++) {
+    const charSpan = document.createElement('span');
+    charSpan.style.color = colors[i % colors.length];
+    charSpan.textContent = text[i];
+    span.appendChild(charSpan);
+  }
+  return span;
+}
+// Change password function
+window.changePassword = async function(username, currentPassword, newPassword) {
+  username = username.trim();
+  currentPassword = currentPassword.trim();
+  newPassword = newPassword.trim();
+  if (!username || !currentPassword || !newPassword) {
+    alert('All fields are required.');
+    return;
+  }
+  try {
+    const userDoc = await getDoc(doc(db, "users", username));
+    if (!userDoc.exists()) {
+      alert('Username does not exist!');
+      return;
+    }
+    const userData = userDoc.data();
+    if (userData.password !== currentPassword) {
+      alert('Current password is incorrect!');
+      return;
+    }
+    // Update password without overwriting other user data
+    await setDoc(doc(db, "users", username), { ...userData, password: newPassword }, { merge: true });
+    alert('Password changed successfully!');
+  } catch (e) {
+    alert('Error changing password.');
+  }
+};
 function applyOutlineStyle(element) {
+  // Apply webkit text stroke (real outline effect)
   element.style.webkitTextStroke = '0.5px black'; // Black outline
   element.style.textFillColor = 'white'; // Text color
 }
+
 
 // Load comments dynamically based on the current page's collection
 window.onload = function() {
