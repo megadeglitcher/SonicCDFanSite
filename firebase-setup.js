@@ -167,7 +167,21 @@ function loadComments() {
       const commentText = document.createElement('p');
       const commentTimestamp = document.createElement('p');
 
-      commentText.textContent = `${commentData.name}: ${commentData.comment}`;
+      // Apply rainbow effect and outline if the user is "SDG"
+      if (commentData.name === "SDG") {
+        commentText.appendChild(rainbowText(`${commentData.name}: `, true));
+        const commentParts = commentData.comment.split('\n').map(part => rainbowText(part));
+        commentParts.forEach(part => {
+          commentText.appendChild(part);
+          commentText.appendChild(document.createElement('br'));
+        });
+        applyOutlineStyle(commentText); // Apply black outline to SDG's text
+      } else {
+        // Regular style for other users
+        commentText.textContent = `${commentData.name}: ${commentData.comment}`;
+      }
+
+      // Timestamp formatting
       commentTimestamp.textContent = new Date(commentData.createdAt).toLocaleString();
       commentTimestamp.style.fontSize = 'small';
       commentTimestamp.style.fontStyle = 'italic';
@@ -180,6 +194,11 @@ function loadComments() {
       commentsContainer.appendChild(commentElement);
     });
   });
+}
+
+function applyOutlineStyle(element) {
+  element.style.webkitTextStroke = '0.5px black'; // Black outline
+  element.style.textFillColor = 'white'; // Text color
 }
 
 // Load comments dynamically based on the current page's collection
