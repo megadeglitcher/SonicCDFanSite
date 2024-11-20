@@ -108,6 +108,12 @@ async function loginUser(username, password) {
 window.registerUser = registerUser;
 window.loginUser = loginUser;
 
+// Extract the current HTML filename without extension
+const currentPage = window.location.pathname.split('/').pop().split('.')[0];
+
+// Determine the Firebase collection name based on the current page
+const commentsCollectionName = `comments-${currentPage}`;
+
 window.submitComment = async function() {
   if (!loggedInUser) {
     alert('You need to be logged in to do that.');
@@ -119,16 +125,16 @@ window.submitComment = async function() {
     return;
   }
 
-  const createdAt = new Date().toISOString();  // Store in UTC
+  const createdAt = new Date().toISOString(); // Store in UTC
 
   try {
-    const docRef = await addDoc(collection(db, "comments"), {
+    const docRef = await addDoc(collection(db, commentsCollectionName), {
       name: loggedInUser,
       comment,
       createdAt
     });
     document.getElementById('comment').value = '';
-    loadComments();  // Reload comments after submission
+    loadComments(); // Reload comments after submission
   } catch (e) {
     console.error("Error adding comment:", e);
   }
@@ -136,8 +142,8 @@ window.submitComment = async function() {
 
 // Add this function to handle the log off functionality
 window.logOff = function() {
-  eraseCookie("loggedInUser");  // Clear the cookie
-  loggedInUser = null;  // Reset logged-in user in JavaScript
+  eraseCookie("loggedInUser"); // Clear the cookie
+  loggedInUser = null; // Reset logged-in user in JavaScript
 
   displayMessage('login-error-message', 'You have been logged out.', false);
 
@@ -150,11 +156,11 @@ window.logOff = function() {
 };
 
 function loadComments() {
-  const commentsRef = collection(db, "comments");
+  const commentsRef = collection(db, commentsCollectionName);
   const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
   onSnapshot(commentsQuery, (snapshot) => {
     const commentsContainer = document.getElementById('comments-container');
-    commentsContainer.innerHTML = '';  // Clear previous comments
+    commentsContainer.innerHTML = ''; // Clear previous comments
     snapshot.forEach((doc) => {
       const commentData = doc.data();
       const commentElement = document.createElement('div');
@@ -174,7 +180,7 @@ function loadComments() {
         });
 
         // Apply outline effect to SDG comment text
-        applyOutlineStyle(commentText);  // Add black outline
+        applyOutlineStyle(commentText); // Add black outline
       } else {
         // Regular style for other users
         commentText.textContent = `${commentData.name}: ${commentData.comment}`;
@@ -195,8 +201,9 @@ function loadComments() {
   });
 }
 
+// Load comments dynamically based on the current page's collection
 window.onload = function() {
-  loadComments();  // Load comments on page load
+  loadComments(); // Load comments on page load
 };
 
 function rainbowText(text, reverse = false) {
@@ -211,6 +218,7 @@ function rainbowText(text, reverse = false) {
   }
   return span;
 }
+
 // Change password function
 window.changePassword = async function(username, currentPassword, newPassword) {
   username = username.trim();
