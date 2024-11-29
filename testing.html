@@ -1,0 +1,50 @@
+<html lang="en">
+<head>
+	<link rel="icon" href="icon.png" type="image/png">
+    <title>testing cd buttons</title>
+    <style>
+		@import url("sonic_cd_menu_font/stylesheet.css");
+
+        /* Remove default body margin/padding */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow-x: hidden; /* Disable horizontal scrolling */
+            overflow-y: auto; /* Allow vertical scrolling */
+        }
+
+        /* Hide scrollbars */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Add background image to the body */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            background: url('images/bg.png') center center / cover fixed no-repeat; /* Background setup */
+            font-family: "sonic cd menu font", sans-serif;
+			text-shadow: 5px 3px 0px rgba(64, 64, 64)
+        }
+
+		h1 {
+			text-align: center;
+			top: 43.4%;
+			position: absolute;
+			color: white;
+			left: 36%;
+			font-size: 1.9vw;
+			color: #e0e0e0;
+		}
+		
+	</style>
+	<div>
+		<img src="button.png" style="width: 700;" id="beans-btn">
+		<h1>TIME ATTACK</h1>
+	</div>
+	<script>
+	const 
