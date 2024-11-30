@@ -65,25 +65,49 @@
 		#beans-btn.clicked {
 			transform: scale(0.95);
 		}
+		
+		.non-interactive-container {
+			pointer-events: none; /* Makes all child elements non-interactive */
+		}
 	</style>
 	<div>
 		<div id="exampleButton">
 			<img src="button.png" style="width: 700px;" id="beans-btn" draggable="false"> <!-- Prevent dragging -->
-			<h1 id="beans-text">TIME ATTACK</h1>
+			<div class="non-interactive-container">
+				<h1 id="beans-text">TIME ATTACK</h1>
+			</div>
 		</div>
 	</div>
 	<script>
 	const exampleButton = document.getElementById("beans-btn");
 	const exampleText = document.getElementById("beans-text");
-	const exampleButtonContainer = document.querySelector("div"); // Select the parent container
+	const exampleButtonContainer = document.querySelector("div");
+	const soundEffect = new Audio('sounds/MenuButton.wav');
+
+	exampleButtonContainer.addEventListener("mouseover", () => {
+		soundEffect.currentTime = 0;
+		soundEffect.volume = 0.7;
+		soundEffect.play();
+		exampleButton.style.filter = "brightness(1.2)";
+		exampleText.style.color = "#FFFF00";
+	});
+
+	exampleButtonContainer.addEventListener("mouseout", () => {
+		exampleButton.style.filter = "none";
+		exampleText.style.color = "#e0e0e0";
+	});
 
 	exampleButtonContainer.addEventListener("mousedown", () => {
 		if (!exampleText.classList.contains("clicked")) {
 			exampleText.classList.add("clicked");
 			exampleButton.classList.add("clicked");
-		} else {
-			exampleText.classList.remove("clicked");
-			exampleButton.classList.remove("clicked");
 		}
 	});
+
+	exampleButtonContainer.addEventListener("mouseup", () => {
+		exampleText.classList.remove("clicked");
+		exampleButton.classList.remove("clicked");
+	});
+	exampleText.style.pointerEvents = "none";
+	
 	</script>
