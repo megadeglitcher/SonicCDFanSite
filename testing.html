@@ -32,9 +32,11 @@
 				6px 0px 0px rgba(64, 64, 64),
 				6px 5px 0px rgba(64, 64, 64),
 				0px 5px 0px rgba(64, 64, 64);
+			user-select: none;
         }
 
 		h1 {
+			user-select: none;
 			margin-left: 15px;
 			text-align: center;
 			top: 44.1%;
@@ -47,6 +49,7 @@
 		}
 		
 		h1.clicked {
+			user-select: none;
 			margin-left: 15px;
 			text-align: center;
 			top: 44.1%;
@@ -64,19 +67,23 @@
 		}
 	</style>
 	<div>
-		<img src="button.png" style="width: 700;" id="beans-btn">
-		<h1 id="beans-text">TIME ATTACK</h1>
+		<div id="exampleButton">
+			<img src="button.png" style="width: 700px;" id="beans-btn" draggable="false"> <!-- Prevent dragging -->
+			<h1 id="beans-text">TIME ATTACK</h1>
+		</div>
 	</div>
 	<script>
 	const exampleButton = document.getElementById("beans-btn");
 	const exampleText = document.getElementById("beans-text");
-	 exampleButton.addEventListener("mousedown", () => {
-        if (!exampleText.classList.contains("clicked")) {
-            exampleText.classList.add("clicked");
-            exampleButton.classList.add("clicked");
-        } else {
-            exampleText.classList.remove("clicked");
-            exampleButton.classList.remove("clicked");
-        }
-    });
+	const exampleButtonContainer = document.querySelector("div"); // Select the parent container
+
+	exampleButtonContainer.addEventListener("mousedown", () => {
+		if (!exampleText.classList.contains("clicked")) {
+			exampleText.classList.add("clicked");
+			exampleButton.classList.add("clicked");
+		} else {
+			exampleText.classList.remove("clicked");
+			exampleButton.classList.remove("clicked");
+		}
+	});
 	</script>
