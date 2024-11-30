@@ -127,9 +127,11 @@
 				exampleButton.classList.remove("clicked");
 
 				// Play the sound effect
-				soundEffectEnter.currentTime = 0; // Reset to the beginning of the sound
-				soundEffectEnter.volume = 0.7; // Set the volume to a reasonable level
-				soundEffectEnter.play();
+				if (!isFlashing) {
+					soundEffectEnter.currentTime = 0; // Reset to the beginning of the sound
+					soundEffectEnter.volume = 0.7; // Set the volume to a reasonable level
+					soundEffectEnter.play();
+				}
 
 				// Flash animation logic
 				isFlashing = true;
@@ -149,7 +151,7 @@
 					exampleText.style.opacity = '1'; // Ensure text is fully visible at the end
 					isFlashing = false; // Reset flashing state
 					// Navigate to the URL
-					window.location.href = "https://megadeglitcher.github.io/SonicCDFanSite/forums.html";
+					window.location.href = "forums.html"
 				};
 			} else {
 				console.log("The sound is already playing. Action not allowed.");
@@ -161,11 +163,17 @@
             if (isFlashing) {
 				exampleButton.style.transform = "scale(0.95)";
 				exampleText.style.transform = "scale(0.95)";
+				soundEffectEnter.currentTime = 0; // Reset to the beginning of the sound
+				soundEffectEnter.volume = 0.1; // Set the volume to a reasonable level
+				soundEffectEnter.play();
             }
         });
 		if (isFlashing) {
 			exampleButton.style.transform = "scale(0.95)";
 			exampleText.style.transform = "scale(0.95)";
+			soundEffectEnter.currentTime = 0; // Reset to the beginning of the sound
+			soundEffectEnter.volume = 0.1; // Set the volume to a reasonable level
+			soundEffectEnter.play();
 		}
 
         exampleText.style.pointerEvents = "none";
