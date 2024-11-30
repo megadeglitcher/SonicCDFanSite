@@ -81,57 +81,60 @@
             </div>
         </div>
     </div>
-    <script>
-        const exampleButton = document.getElementById("beans-btn");
-        const exampleText = document.getElementById("beans-text");
-        const exampleButtonContainer = document.querySelector("div");
-        const soundEffect = new Audio('sounds/MenuButton.wav');
-        const soundEffectEnter = new Audio('sounds/Select.wav'); // Adjust path as needed
+	<script>
+		const exampleButton = document.getElementById("beans-btn");
+		const exampleText = document.getElementById("beans-text");
+		const exampleButtonContainer = document.querySelector("div");
+		const soundEffect = new Audio('sounds/MenuButton.wav');
+		const soundEffectEnter = new Audio('sounds/Select.wav');
 
-        let isFlashing = false;
-        let intervalId = null;
+		let isFlashing = false;
+		let intervalId = null;
+		let isNavigating = false; // Flag to prevent duplicate actions
+		let isPressed = false; // Flag to keep track if the button has been pressed
 
-        exampleButtonContainer.addEventListener("mouseover", () => {
-            if (!isFlashing) {
-                soundEffect.currentTime = 0;
-                soundEffect.volume = 0.7;
-                soundEffect.play();
-                exampleButton.style.filter = "brightness(1.2)";
-                exampleText.style.color = "#FFFF00";
-            }
-        });
-
-        exampleButtonContainer.addEventListener("mouseout", () => {
-            if (!isFlashing) {
-                exampleButton.style.filter = "none";
-                exampleText.style.color = "#e0e0e0";
-            }
-			if (!isFlashing) {
-				exampleButton.style.transform = "scale(1)";
-				exampleText.style.transform = "scale(1)";
+		exampleButtonContainer.addEventListener("mouseover", () => {
+			if (!isFlashing && !isNavigating && !isPressed) { // Ensure the button isn't already pressed
+				soundEffect.currentTime = 0;
+				soundEffect.volume = 0.7;
+				soundEffect.play();
+				exampleButton.style.filter = "brightness(1.2)";
+				exampleText.style.color = "#FFFF00";
 			}
-        });
+		});
 
-        exampleButtonContainer.addEventListener("mousedown", () => {
-            if (!exampleText.classList.contains("clicked")) {
-                exampleText.classList.add("clicked");
-                exampleButton.classList.add("clicked");
-            }
-			exampleButton.style.transform = "scale(0.95)";
-			exampleText.style.transform = "scale(0.95)";
-        });
+		exampleButtonContainer.addEventListener("mouseout", () => {
+			if (!isFlashing && !isNavigating) { // Check if not navigating
+				exampleButton.style.filter = "none";
+				exampleText.style.color = "#e0e0e0";
+				if (!isFlashing) {
+					exampleButton.style.transform = "scale(1)";
+					exampleText.style.transform = "scale(1)";
+				}
+			}
+		});
+
+		exampleButtonContainer.addEventListener("mousedown", () => {
+			if (!isNavigating && !isPressed) { // Check if the button isn't already pressed
+				isPressed = true; // Mark the button as pressed
+				exampleText.classList.add("clicked");
+				exampleButton.classList.add("clicked");
+				exampleButton.style.transform = "scale(0.95)";
+				exampleText.style.transform = "scale(0.95)";
+			}
+		});
+
 		exampleButtonContainer.addEventListener("mouseup", () => {
-			// Check if the audio is not playing before proceeding
-			if (soundEffectEnter.paused || soundEffectEnter.ended) {
+			if (!isNavigating && (soundEffectEnter.paused || soundEffectEnter.ended)) {
+				isNavigating = true; // Set the flag to true to indicate navigation is in progress
+
 				exampleText.classList.remove("clicked");
 				exampleButton.classList.remove("clicked");
 
-				// Play the sound effect
-				if (!isFlashing) {
-					soundEffectEnter.currentTime = 0; // Reset to the beginning of the sound
-					soundEffectEnter.volume = 0.7; // Set the volume to a reasonable level
-					soundEffectEnter.play();
-				}
+				// Play the sound effect only if not already playing
+				soundEffectEnter.currentTime = 0; // Reset to the beginning of the sound
+				soundEffectEnter.volume = 0.7;
+				soundEffectEnter.play();
 
 				// Flash animation logic
 				isFlashing = true;
@@ -143,34 +146,42 @@
 						exampleText.style.opacity = '1';
 					}
 					isVisible = !isVisible;
-				}, 50); // Change every 50ms to simulate a 10 frame-per-second flash effect (assuming 60fps)
+				}, 50);
 
-				// Stop the flashing after the sound has played
+				// Stop the flashing and navigate after the sound has played
 				soundEffectEnter.onended = () => {
-					clearInterval(intervalId); // Stop the flashing
+					clearInterval(intervalId);
 					exampleText.style.opacity = '1'; // Ensure text is fully visible at the end
 					isFlashing = false; // Reset flashing state
+					isNavigating = false; // Reset navigation flag
+
 					// Navigate to the URL
-					window.location.href = "forums.html"
+					window.location.href = "forums.html";
 				};
+			} else if (isNavigating) {
+				console.log("Navigation in progress. Action not allowed.");
 			} else {
 				console.log("The sound is already playing. Action not allowed.");
 			}
 		});
 
-
-        exampleButtonContainer.addEventListener("mouseleave", () => {
-            if (isFlashing) {
+		exampleButtonContainer.addEventListener("mouseleave", () => {
+			if (isFlashing && !isNavigating) { // Ensure it's not during navigation
 				exampleButton.style.transform = "scale(0.95)";
 				exampleText.style.transform = "scale(0.95)";
-            }
-        });
-		if (isFlashing) {
+				soundEffectEnter.currentTime = 0; // Reset to the beginning of the sound
+				soundEffectEnter.volume = 0.1; // Set the volume to a reasonable level
+				soundEffectEnter.play();
+			}
+		});
+
+		// If the button has been pressed, maintain the scale of 0.95
+		if (isPressed) {
 			exampleButton.style.transform = "scale(0.95)";
 			exampleText.style.transform = "scale(0.95)";
 		}
 
-        exampleText.style.pointerEvents = "none";
-    </script>
+		exampleText.style.pointerEvents = "none";
+	</script>
 </body>
 </html>
