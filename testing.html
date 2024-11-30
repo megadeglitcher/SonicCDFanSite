@@ -46,10 +46,37 @@
 			letter-spacing: 10px;
 		}
 		
+		h1.clicked {
+			margin-left: 15px;
+			text-align: center;
+			top: 44.1%;
+			position: absolute;
+			color: white;
+			left: 36%;
+			font-size: 1.7vw;
+			color: #e0e000;
+			letter-spacing: 10px;
+			transform: scale(0.95);
+		}
+		
+		#beans-btn.clicked {
+			transform: scale(0.95);
+		}
 	</style>
 	<div>
 		<img src="button.png" style="width: 700;" id="beans-btn">
-		<h1>TIME ATTACK</h1>
+		<h1 id="beans-text">TIME ATTACK</h1>
 	</div>
 	<script>
-	const 
+	const exampleButton = document.getElementById("beans-btn");
+	const exampleText = document.getElementById("beans-text");
+	 exampleButton.addEventListener("mousedown", () => {
+        if (!exampleText.classList.contains("clicked")) {
+            exampleText.classList.add("clicked");
+            exampleButton.classList.add("clicked");
+        } else {
+            exampleText.classList.remove("clicked");
+            exampleButton.classList.remove("clicked");
+        }
+    });
+	</script>
