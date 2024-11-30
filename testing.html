@@ -1,9 +1,9 @@
 <html lang="en">
 <head>
-	<link rel="icon" href="icon.png" type="image/png">
+    <link rel="icon" href="icon.png" type="image/png">
     <title>testing cd buttons</title>
     <style>
-		@import url("sonic_cd_menu_font/stylesheet.css");
+        @import url("sonic_cd_menu_font/stylesheet.css");
 
         /* Remove default body margin/padding */
         html, body {
@@ -28,86 +28,147 @@
             min-height: 100vh;
             background: url('images/bg.png') center center / cover fixed no-repeat; /* Background setup */
             font-family: "sonic cd menu font", sans-serif;
-			text-shadow: 
-				6px 0px 0px rgba(64, 64, 64),
-				6px 5px 0px rgba(64, 64, 64),
-				0px 5px 0px rgba(64, 64, 64);
-			user-select: none;
+            text-shadow: 
+                6px 0px 0px rgba(64, 64, 64),
+                6px 5px 0px rgba(64, 64, 64),
+                0px 5px 0px rgba(64, 64, 64);
+            user-select: none;
         }
 
-		h1 {
-			user-select: none;
-			margin-left: 15px;
-			text-align: center;
-			top: 44.1%;
-			position: absolute;
-			color: white;
-			left: 36%;
-			font-size: 1.7vw;
-			color: #e0e0e0;
-			letter-spacing: 10px;
-		}
-		
-		h1.clicked {
-			user-select: none;
-			margin-left: 15px;
-			text-align: center;
-			top: 44.1%;
-			position: absolute;
-			color: white;
-			left: 36%;
-			font-size: 1.7vw;
-			color: #e0e000;
-			letter-spacing: 10px;
-			transform: scale(0.95);
-		}
-		
-		#beans-btn.clicked {
-			transform: scale(0.95);
-		}
-		
-		.non-interactive-container {
-			pointer-events: none; /* Makes all child elements non-interactive */
-		}
-	</style>
-	<div>
-		<div id="exampleButton">
-			<img src="button.png" style="width: 700px;" id="beans-btn" draggable="false"> <!-- Prevent dragging -->
-			<div class="non-interactive-container">
-				<h1 id="beans-text">TIME ATTACK</h1>
-			</div>
-		</div>
-	</div>
-	<script>
-	const exampleButton = document.getElementById("beans-btn");
-	const exampleText = document.getElementById("beans-text");
-	const exampleButtonContainer = document.querySelector("div");
-	const soundEffect = new Audio('sounds/MenuButton.wav');
+        h1 {
+            user-select: none;
+            margin-left: 15px;
+            text-align: center;
+            top: 44.1%;
+            position: absolute;
+            color: white;
+            left: 36%;
+            font-size: 1.7vw;
+            color: #e0e0e0;
+            letter-spacing: 10px;
+            transform: scale(1);
+        }
+        
+        h1.clicked {
+            user-select: none;
+            margin-left: 15px;
+            text-align: center;
+            top: 44.1%;
+            position: absolute;
+            color: white;
+            left: 36%;
+            font-size: 1.7vw;
+            color: #e0e000;
+            letter-spacing: 10px;
+            transform: scale(0.95);
+        }
+        
+        #beans-btn.clicked {
+            transform: scale(0.95);
+        }
+        
+        .non-interactive-container {
+            pointer-events: none; /* Makes all child elements non-interactive */
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div id="exampleButton">
+            <img src="button.png" style="width: 700px;" id="beans-btn" draggable="false"> <!-- Prevent dragging -->
+            <div class="non-interactive-container">
+                <h1 id="beans-text">TIME ATTACK</h1>
+            </div>
+        </div>
+    </div>
+    <script>
+        const exampleButton = document.getElementById("beans-btn");
+        const exampleText = document.getElementById("beans-text");
+        const exampleButtonContainer = document.querySelector("div");
+        const soundEffect = new Audio('sounds/MenuButton.wav');
+        const soundEffectEnter = new Audio('sounds/Select.wav'); // Adjust path as needed
 
-	exampleButtonContainer.addEventListener("mouseover", () => {
-		soundEffect.currentTime = 0;
-		soundEffect.volume = 0.7;
-		soundEffect.play();
-		exampleButton.style.filter = "brightness(1.2)";
-		exampleText.style.color = "#FFFF00";
-	});
+        let isFlashing = false;
+        let intervalId = null;
 
-	exampleButtonContainer.addEventListener("mouseout", () => {
-		exampleButton.style.filter = "none";
-		exampleText.style.color = "#e0e0e0";
-	});
+        exampleButtonContainer.addEventListener("mouseover", () => {
+            if (!isFlashing) {
+                soundEffect.currentTime = 0;
+                soundEffect.volume = 0.7;
+                soundEffect.play();
+                exampleButton.style.filter = "brightness(1.2)";
+                exampleText.style.color = "#FFFF00";
+            }
+        });
 
-	exampleButtonContainer.addEventListener("mousedown", () => {
-		if (!exampleText.classList.contains("clicked")) {
-			exampleText.classList.add("clicked");
-			exampleButton.classList.add("clicked");
+        exampleButtonContainer.addEventListener("mouseout", () => {
+            if (!isFlashing) {
+                exampleButton.style.filter = "none";
+                exampleText.style.color = "#e0e0e0";
+            }
+			if (!isFlashing) {
+				exampleButton.style.transform = "scale(1)";
+				exampleText.style.transform = "scale(1)";
+			}
+        });
+
+        exampleButtonContainer.addEventListener("mousedown", () => {
+            if (!exampleText.classList.contains("clicked")) {
+                exampleText.classList.add("clicked");
+                exampleButton.classList.add("clicked");
+            }
+			exampleButton.style.transform = "scale(0.95)";
+			exampleText.style.transform = "scale(0.95)";
+        });
+		exampleButtonContainer.addEventListener("mouseup", () => {
+			// Check if the audio is not playing before proceeding
+			if (soundEffectEnter.paused || soundEffectEnter.ended) {
+				exampleText.classList.remove("clicked");
+				exampleButton.classList.remove("clicked");
+
+				// Play the sound effect
+				soundEffectEnter.currentTime = 0; // Reset to the beginning of the sound
+				soundEffectEnter.volume = 0.7; // Set the volume to a reasonable level
+				soundEffectEnter.play();
+
+				// Flash animation logic
+				isFlashing = true;
+				let isVisible = true;
+				intervalId = setInterval(() => {
+					if (isVisible) {
+						exampleText.style.opacity = '0';
+					} else {
+						exampleText.style.opacity = '1';
+					}
+					isVisible = !isVisible;
+				}, 50); // Change every 50ms to simulate a 10 frame-per-second flash effect (assuming 60fps)
+
+				// Stop the flashing after the sound has played
+				soundEffectEnter.onended = () => {
+					clearInterval(intervalId); // Stop the flashing
+					exampleText.style.opacity = '1'; // Ensure text is fully visible at the end
+					isFlashing = false; // Reset flashing state
+					// Navigate to the URL
+					window.location.href = "https://megadeglitcher.github.io/SonicCDFanSite/forums.html";
+				};
+			} else {
+				console.log("The sound is already playing. Action not allowed.");
+			}
+		});
+
+
+        exampleButtonContainer.addEventListener("mouseleave", () => {
+            if (isFlashing) {
+				exampleButton.style.transform = "scale(0.95)";
+				exampleText.style.transform = "scale(0.95)";
+            }
+        });
+		if (isFlashing) {
+			exampleButton.style.transform = "scale(0.95)";
+			exampleText.style.transform = "scale(0.95)";
 		}
-	});
 
-	exampleButtonContainer.addEventListener("mouseup", () => {
-		exampleText.classList.remove("clicked");
-		exampleButton.classList.remove("clicked");
-	});
-	exampleText.style.pointerEvents = "none";
-	
-	</script>
+        exampleText.style.pointerEvents = "none";
+    </script>
+</body>
+</html>
