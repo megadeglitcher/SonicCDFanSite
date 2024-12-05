@@ -120,7 +120,6 @@
 
 		exampleButtonContainer.addEventListener("mousedown", () => {
 			if (!isNavigating && !isPressed) { // Check if the button isn't already pressed
-				isPressed = true; // Mark the button as pressed
 				exampleText.classList.add("clicked");
 				exampleButton.classList.add("clicked");
 				exampleButton.style.transform = "scale(0.95)";
@@ -140,6 +139,7 @@
 				soundEffectEnter.volume = 0.7;
 				soundEffectEnter.play();
 
+				isPressed = true; // Mark the button as pressed
 				// Flash animation logic
 				isFlashing = true;
 				let isVisible = true;
