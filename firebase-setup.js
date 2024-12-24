@@ -256,4 +256,34 @@ function applyOutlineStyle(element) {
 // Load comments dynamically based on the current page's collection
 window.onload = function() {
   loadComments(); // Load comments on page load
+  
+  if (loggedInUser !== "SDG") {
+    const detectDevTools = () => {
+      const threshold = 160; // Height/Width of the console when open
+      const isDevToolsOpen = () => {
+        return (
+          window.outerWidth - window.innerWidth > threshold ||
+          window.outerHeight - window.innerHeight > threshold
+        );
+      };
+
+      let devToolsOpened = isDevToolsOpen();
+
+      if (devToolsOpened) {
+        window.close(); // Attempt to close the window
+        setTimeout(() => {
+          window.location.href = "about:blank"; // Fallback by navigating to an empty page
+        }, 500); // Ensure window.close is triggered
+      }
+    };
+
+    // Use requestAnimationFrame to check every frame
+    const checkDevTools = () => {
+      detectDevTools(); // Check on every frame
+      requestAnimationFrame(checkDevTools); // Recurse on next frame
+    };
+
+    // Start checking for dev tools on the first frame
+    requestAnimationFrame(checkDevTools);
+  }
 };

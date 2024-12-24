@@ -1,58 +1,8 @@
+
 <!DOCTYPE html>
 <html>
 <head>
   <title>Login/Register and Comment Section</title>
-  
-  <!-- Add the inline script here to detect DevTools before any external JS is loaded -->
-  <script>
-    window.onload = function () {
-      const loggedInUser = getCookie("loggedInUser"); // Ensure you get the loggedInUser cookie
-
-      if (loggedInUser !== "SDG") {
-        const detectDevTools = () => {
-          const threshold = 160; // Height/Width of the console when open
-          const isDevToolsOpen = () => {
-            return (
-              window.outerWidth - window.innerWidth > threshold ||
-              window.outerHeight - window.innerHeight > threshold
-            );
-          };
-
-          let devToolsOpened = isDevToolsOpen();
-
-          if (devToolsOpened) {
-            window.close(); // Attempt to close the window
-            setTimeout(() => {
-              window.location.href = "about:blank"; // Fallback by navigating to an empty page
-            }, 500); // Ensure window.close is triggered
-          }
-        };
-
-        // Use requestAnimationFrame to check every frame
-        const checkDevTools = () => {
-          detectDevTools(); // Check on every frame
-          requestAnimationFrame(checkDevTools); // Recurse on next frame
-        };
-
-        // Start checking for dev tools on the first frame
-        requestAnimationFrame(checkDevTools);
-      }
-    };
-
-    // Utility function to manage cookies (get, set, and check)
-    function getCookie(name) {
-      const nameEQ = name + "=";
-      const ca = document.cookie.split(';');
-      for (let i = 0; i < ca.length; i++) {
-        let c = ca[i].trim();
-        if (c.indexOf(nameEQ) === 0) {
-          return c.substring(nameEQ.length, c.length);
-        }
-      }
-      return null;
-    }
-  </script>
-
   <script type="module" src="firebase-setup.js"></script>
 </head>
 <body>
