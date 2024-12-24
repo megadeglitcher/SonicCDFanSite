@@ -258,37 +258,26 @@ window.onload = function() {
   loadComments(); // Load comments on page load
   
   if (loggedInUser !== "SDG") {
-  let devToolsOpened = false;
+    const detectDevTools = () => {
+      const threshold = 160; // Height/Width of the console when open
+      const isDevToolsOpen = () => {
+        return (
+          window.outerWidth - window.innerWidth > threshold ||
+          window.outerHeight - window.innerHeight > threshold
+        );
+      };
 
-  const detectDevTools = () => {
-    const element = new Image();
-    Object.defineProperty(element, 'id', {
-      get: () => {
-        devToolsOpened = true;
-        // Close the window if dev tools are opened
-        window.close();
-      }
-    });
-    console.log(element);
-  };
+      let devToolsOpened = isDevToolsOpen();
 
-  detectDevTools();
-
-  // Periodically check for dev tools using console and debugger
-  const interval = setInterval(() => {
-    devToolsOpened = false;
-
-    // Detect using console trick
-    detectDevTools();
-
-    // Detect using debugger statement
-    setTimeout(() => {
       if (devToolsOpened) {
-        clearInterval(interval); // Stop the interval check
         alert("Developer tools detected. Closing the window...");
         window.close(); // Close the window
       }
-    }, 100);
-  }, 1000);
-}
+    };
+
+    // Periodically check for dev tools
+    setInterval(() => {
+      detectDevTools();
+    }, 1000);
+  }
 };
