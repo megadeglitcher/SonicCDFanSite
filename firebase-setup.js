@@ -55,6 +55,10 @@ function displayMessage(elementId, message, isError = true) {
 
 async function registerUser(username, password) {
   username = username.trim();
+  if (/\s/.test(username)) {
+  displayMessage('register-error-message', 'Username cannot contain spaces!');
+  return;
+}
   if (!username) {
     displayMessage('register-error-message', 'Username cannot be empty or just whitespace!');
     return;
@@ -80,6 +84,10 @@ async function registerUser(username, password) {
 
 async function loginUser(username, password) {
   username = username.trim();
+  if (/\s/.test(username)) {
+	displayMessage('login-error-message', 'Username cannot contain spaces!');
+	return;
+	}
   if (!username) {
     displayMessage('login-error-message', 'Username cannot be empty or just whitespace!');
     return;
