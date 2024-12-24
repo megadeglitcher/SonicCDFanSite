@@ -1,8 +1,61 @@
-
 <!DOCTYPE html>
 <html>
 <head>
   <title>Login/Register and Comment Section</title>
+
+  <script>
+    window.onload = function () {
+      const loggedInUser = getCookie("loggedInUser");
+
+      if (loggedInUser !== "SDG") {
+        let devToolsOpened = false;
+
+        // Function to detect if DevTools is open
+        const detectDevTools = () => {
+          const threshold = 160; // Height/Width of the console when open
+          const isDevToolsOpen = () => {
+            return (
+              window.outerWidth - window.innerWidth > threshold ||
+              window.outerHeight - window.innerHeight > threshold
+            );
+          };
+
+          devToolsOpened = isDevToolsOpen();
+
+          if (devToolsOpened) {
+            // Try to close the window
+            window.close(); // Attempt to close the window
+            setTimeout(() => {
+              window.location.href = "about:blank"; // Fallback to navigate to blank page
+            }, 500); // Fallback after a short delay to ensure window.close is processed
+          }
+        };
+
+        // Use requestAnimationFrame to check every frame for DevTools
+        const checkDevTools = () => {
+          detectDevTools(); // Detect DevTools
+          requestAnimationFrame(checkDevTools); // Check again on the next frame
+        };
+
+        // Start checking for dev tools on the first frame
+        requestAnimationFrame(checkDevTools);
+      }
+    };
+
+    // Utility function to manage cookies (get, set, and check)
+    function getCookie(name) {
+      const nameEQ = name + "=";
+      const ca = document.cookie.split(';');
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i].trim();
+        if (c.indexOf(nameEQ) === 0) {
+          return c.substring(nameEQ.length, c.length);
+        }
+      }
+      return null;
+    }
+  </script>
+
   <script type="module" src="firebase-setup.js"></script>
 </head>
 <body>
