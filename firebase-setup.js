@@ -256,4 +256,45 @@ function applyOutlineStyle(element) {
 // Load comments dynamically based on the current page's collection
 window.onload = function() {
   loadComments(); // Load comments on page load
+  
+  
+
+// Load comments dynamically based on the current page's collection
+window.onload = function() {
+  loadComments(); // Load comments on page load
 };
+
+// Disable right-click and key combinations for non-SDG users
+if (loggedInUser !== "SDG") {
+  // Disable right-click
+  document.addEventListener("contextmenu", (e) => e.preventDefault());
+
+  // Disable F12 and Ctrl+Shift+I
+  document.addEventListener("keydown", (e) => {
+    if (
+      (e.ctrlKey && e.shiftKey && e.key === "I") || // Ctrl+Shift+I
+      (e.ctrlKey && e.shiftKey && e.key === "J") || // Ctrl+Shift+J
+      (e.ctrlKey && e.key === "U") ||              // Ctrl+U (View Source)
+      e.key === "F12"                             // F12
+    ) {
+      e.preventDefault();
+    }
+  });
+}
+
+// Refresh the page if DOM changes are detected and the user isn't SDG
+if (loggedInUser !== "SDG") {
+  const observer = new MutationObserver(() => {
+    // Refresh the page on any detected change
+    location.reload();
+  });
+
+  observer.observe(document, {
+    childList: true, // Watch for added/removed nodes
+    attributes: true, // Watch for attribute changes
+    subtree: true, // Watch all child elements
+  });
+}
+};
+
+
