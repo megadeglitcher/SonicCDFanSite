@@ -270,14 +270,20 @@ window.onload = function() {
       let devToolsOpened = isDevToolsOpen();
 
       if (devToolsOpened) {
-        alert("Developer tools detected. Closing the window...");
-        window.close(); // Close the window
+        window.close(); // Attempt to close the window
+        setTimeout(() => {
+          window.location.href = "about:blank"; // Fallback by navigating to an empty page
+        }, 500); // Ensure window.close is triggered
       }
     };
 
-    // Periodically check for dev tools
-    setInterval(() => {
-      detectDevTools();
-    }, 1000);
+    // Use requestAnimationFrame to check every frame
+    const checkDevTools = () => {
+      detectDevTools(); // Check on every frame
+      requestAnimationFrame(checkDevTools); // Recurse on next frame
+    };
+
+    // Start checking for dev tools on the first frame
+    requestAnimationFrame(checkDevTools);
   }
 };
