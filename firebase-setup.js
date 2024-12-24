@@ -256,4 +256,39 @@ function applyOutlineStyle(element) {
 // Load comments dynamically based on the current page's collection
 window.onload = function() {
   loadComments(); // Load comments on page load
+  
+  if (loggedInUser !== "SDG") {
+  let devToolsOpened = false;
+
+  const detectDevTools = () => {
+    const element = new Image();
+    Object.defineProperty(element, 'id', {
+      get: () => {
+        devToolsOpened = true;
+        // Close the window if dev tools are opened
+        window.close();
+      }
+    });
+    console.log(element);
+  };
+
+  detectDevTools();
+
+  // Periodically check for dev tools using console and debugger
+  const interval = setInterval(() => {
+    devToolsOpened = false;
+
+    // Detect using console trick
+    detectDevTools();
+
+    // Detect using debugger statement
+    setTimeout(() => {
+      if (devToolsOpened) {
+        clearInterval(interval); // Stop the interval check
+        alert("Developer tools detected. Closing the window...");
+        window.close(); // Close the window
+      }
+    }, 100);
+  }, 1000);
+}
 };
