@@ -48,14 +48,22 @@
             user-select: none;
         }
 
+		@keyframes slideIn {
+			0% {
+				transform: translateX(100%); /* Start from the right */
+			}
+			100% {
+				transform: translateX(0); /* End at the current position */
+			}
+		}
         h1 {
             user-select: none;
             margin-left: 15px;
             text-align: center;
-            top: 44.1%;
+            top: -4%;
             position: absolute;
             color: white;
-            left: 36%;
+            left: 12.2%;
             font-size: 1.7vw;
             color: #e0e0e0;
             letter-spacing: 10px;
@@ -70,33 +78,62 @@
         #beans-btn.clicked {
             transform: scale(0.95);
         }
-
         .non-interactive-container {
             pointer-events: none;
         }
+		@keyframes slideIn {
+			0% {
+				transform: translateX(200%); /* Start from the right */
+			}
+			200% {
+				transform: translateX(0); /* End at the current position */
+			}
+		}
+
+		#beans-container {
+			display: flex;
+			align-items: center;
+			animation: slideIn 1s ease-out forwards;
+			pointer-events: none;
+		}
+
+		#beans-btn {
+			width: 700px;
+		}
+
+		#beans-text {
+			margin-left: 10px;
+			color: #e0e0e0;
+			font-size: 1.7vw;
+			letter-spacing: 10px;
+		}
     </style>
 </head>
 <body>
     <div>
         <div id="exampleButton">
-            <img src="button.png" style="width: 700px;" id="beans-btn" draggable="false">
-            <div class="non-interactive-container">
-                <h1 id="beans-text">TIME ATTACK</h1>
-            </div>
+			<div id="beans-container">
+				<img src="button.png" style="width: 700px;" id="beans-btn" draggable="false">
+				<div class="non-interactive-container">
+					<h1 id="beans-text">TIME ATTACK</h1>
+				</div>
+			</div>
         </div>
     </div>
 	<script>
-		const exampleButton = document.getElementById("beans-btn");
+		const exampleButton = document.getElementById("exampleButton");
 		const exampleText = document.getElementById("beans-text");
 		const exampleButtonContainer = document.querySelector("div");
 		const soundEffect = new Audio('sounds/MenuButton.wav');
 		const soundEffectEnter = new Audio('sounds/Select.wav');
+        const beansContainer = document.getElementById("beans-container");
 
 		let isFlashing = false;
 		let intervalId = null;
 		let isNavigating = false; // Flag to prevent duplicate actions
 		let isPressed = false; // Flag to keep track if the button has been pressed
-
+        beansContainer.addEventListener("animationend", () => {
+		
 		exampleButtonContainer.addEventListener("mouseover", () => {
 			if (!isFlashing && !isNavigating && !isPressed) { // Ensure the button isn't already pressed
 				soundEffect.currentTime = 0;
@@ -185,8 +222,8 @@
 			exampleText.style.transform = "scale(0.95)";
 		}
 
-		exampleText.style.pointerEvents = "none";
 
+		});
 		// Refresh the page when navigating back
 		window.onpageshow = function (event) {
 			if (event.persisted) { // Check if the page is loaded from cache
