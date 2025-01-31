@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="icon.png" type="image/png">
-    <title>testing cd buttons sh</title>
+    <title>testing cd buttons smh</title>
 
     <!-- Open Graph meta tags -->
     <meta property="og:title" content="SDG's Sonic CD Fansite">
@@ -29,12 +29,7 @@
             overflow-x: hidden;
             overflow-y: auto;
         }
-		.viewport-wrapper {
-    width: 1920px;
-    height: 1080px;
-    position: relative;
-    overflow: hidden;
-}
+		
 
         ::-webkit-scrollbar {
             display: none;
@@ -164,47 +159,51 @@
 
 		exampleButtonContainer.addEventListener("mousedown", () => {
 			if (!isNavigating && !isPressed) { // Check if the button isn't already pressed
-				exampleText.classList.add("clicked");
-				exampleButton.classList.add("clicked");
-				exampleButton.style.transform = "scale(0.95)";
-				exampleText.style.transform = "scale(0.95)";
+				if (exampleText.style.color === "rgb(255, 255, 0)") {
+					exampleText.classList.add("clicked");
+					exampleButton.classList.add("clicked");
+					exampleButton.style.transform = "scale(0.95)";
+					exampleText.style.transform = "scale(0.95)";
+				}
 			}
 		});
 
 		exampleButtonContainer.addEventListener("mouseup", () => {
 			if (!isNavigating && (soundEffectEnter.paused || soundEffectEnter.ended)) {
-				isNavigating = true; // Set the flag to true to indicate navigation is in progress
+				if (exampleText.style.color === "rgb(255, 255, 0)") {
+					isNavigating = true; // Set the flag to true to indicate navigation is in progress
 
-				exampleText.classList.remove("clicked");
-				exampleButton.classList.remove("clicked");
+					exampleText.classList.remove("clicked");
+					exampleButton.classList.remove("clicked");
 
-				// Play the sound effect only if not already playing
-				soundEffectEnter.currentTime = 0; // Reset to the beginning of the sound
-				soundEffectEnter.volume = 0.7;
-				soundEffectEnter.play();
+					// Play the sound effect only if not already playing
+					soundEffectEnter.currentTime = 0; // Reset to the beginning of the sound
+					soundEffectEnter.volume = 0.7;
+					soundEffectEnter.play();
 
-				isPressed = true; // Mark the button as pressed
-				// Flash animation logic
-				isFlashing = true;
-				let isVisible = true;
-				intervalId = setInterval(() => {
-					if (isVisible) {
-						exampleText.style.opacity = '0';
-					} else {
-						exampleText.style.opacity = '1';
-					}
-					isVisible = !isVisible;
-				}, 50);
+					isPressed = true; // Mark the button as pressed
+					// Flash animation logic
+					isFlashing = true;
+					let isVisible = true;
+					intervalId = setInterval(() => {
+						if (isVisible) {
+							exampleText.style.opacity = '0';
+						} else {
+							exampleText.style.opacity = '1';
+						}
+						isVisible = !isVisible;
+					}, 50);
 
-				// Stop the flashing and navigate after the sound has played
-				soundEffectEnter.onended = () => {
-					clearInterval(intervalId);
-					exampleText.style.opacity = '1'; // Ensure text is fully visible at the end
-					isFlashing = false; // Reset flashing state
-					isNavigating = false; // Reset navigation flag
+					// Stop the flashing and navigate after the sound has played
+					soundEffectEnter.onended = () => {
+						clearInterval(intervalId);
+						exampleText.style.opacity = '1'; // Ensure text is fully visible at the end
+						isFlashing = false; // Reset flashing state
+						isNavigating = false; // Reset navigation flag
 
-					// Navigate to the URL
-					window.location.href = "forums.html";
+						// Navigate to the URL
+						window.location.href = "forums.html";
+					};
 				};
 			} else if (isNavigating) {
 				console.log("Navigation in progress. Action not allowed.");
