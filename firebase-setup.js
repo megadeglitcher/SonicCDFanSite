@@ -1,28 +1,18 @@
 // Import Firebase libraries
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { initializeAppCheck, ReCaptchaV3Provider, getToken } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app-check.js";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  query,
-  orderBy,
-  onSnapshot,
-  setDoc,
-  doc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCrxSA-Y5FjKCkULoQ3iwCiKaupZOSK9FU",
-  authDomain: "soniccdfansite.firebaseapp.com",
-  projectId: "soniccdfansite",
-  storageBucket: "soniccdfansite.firebasestorage.app",
-  messagingSenderId: "739250141699",
-  appId: "1:739250141699:web:1925788f3944b1aa58ac36",
-  measurementId: "G-EQK0WQWQ33"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID",
+  measurementId: "YOUR_MEASUREMENT_ID"
 };
 
 // Initialize Firebase
@@ -30,59 +20,25 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize App Check with reCAPTCHA v3 (invisible)
 const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider('6LdBNdkqAAAAAIh8NW8oqzlKemtRTOeV-To_Y9g8'),
+  provider: new ReCaptchaV3Provider('YOUR_RECAPTCHA_SITE_KEY'),
   isTokenAutoRefreshEnabled: true
-});
-
-// Force a token refresh on load to ensure fresh tokens
-getToken(appCheck, true).then(tokenResult => {
-  console.log('Fresh App Check token obtained:', tokenResult.token);
-}).catch(err => {
-  console.error('Error obtaining App Check token:', err);
 });
 
 // Initialize Firestore and Auth
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// Utility functions for cookies and messages
-function setCookie(name, value, days) {
-  const date = new Date();
-  date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-  const expires = "expires=" + date.toUTCString();
-  document.cookie = name + "=" + value + ";" + expires + ";path=/";
+// Function to get reCAPTCHA token
+function getRecaptchaToken() {
+  return getToken(appCheck, true).then((tokenResult) => {
+    return tokenResult.token;
+  }).catch((err) => {
+    console.error('Error obtaining reCAPTCHA token:', err);
+    return null;
+  });
 }
 
-function getCookie(name) {
-  const nameEQ = name + "=";
-  const ca = document.cookie.split(";");
-  for (let i = 0; i < ca.length; i++) {
-    let c = ca[i].trim();
-    if (c.indexOf(nameEQ) === 0) {
-      return c.substring(nameEQ.length, c.length);
-    }
-  }
-  return null;
-}
-
-function eraseCookie(name) {
-  document.cookie = name + "=; Max-Age=-99999999;";
-}
-
-function displayMessage(elementId, message, isError = true) {
-  const element = document.getElementById(elementId);
-  if (!element) return; // Prevent errors if element not found
-  element.textContent = message;
-  element.style.color = isError ? "red" : "green";
-  setTimeout(() => {
-    element.textContent = "";
-  }, 5000);
-}
-
-// Retrieve logged in user from cookies (if any)
-let loggedInUser = getCookie("loggedInUser");
-
-// Register a new user (stored in Firestore "users" collection)
+// Register a new user (with reCAPTCHA verification)
 export async function registerUser(username, password) {
   username = username.trim();
   if (/\s/.test(username)) {
@@ -94,11 +50,12 @@ export async function registerUser(username, password) {
     return;
   }
 
-  // Get reCAPTCHA token for registration action
-  const token = await getToken(appCheck);
-  
-  // Verify the token here or pass it to the backend for verification
-  console.log('reCAPTCHA Token for registration:', token);
+  // Get reCAPTCHA token
+  const captchaToken = await getRecaptchaToken();
+  if (!captchaToken) {
+    displayMessage("register-error-message", "reCAPTCHA verification failed.");
+    return;
+  }
 
   try {
     const userDoc = await getDoc(doc(db, "users", username));
@@ -110,7 +67,8 @@ export async function registerUser(username, password) {
     await setDoc(doc(db, "users", username), {
       username,
       password,
-      createdAt
+      createdAt,
+      captchaToken
     });
     displayMessage("register-error-message", "User registered successfully!", false);
   } catch (e) {
@@ -118,7 +76,7 @@ export async function registerUser(username, password) {
   }
 }
 
-// Login an existing user
+// Login an existing user (with reCAPTCHA verification)
 export async function loginUser(username, password) {
   username = username.trim();
   if (/\s/.test(username)) {
@@ -130,11 +88,12 @@ export async function loginUser(username, password) {
     return;
   }
 
-  // Get reCAPTCHA token for login action
-  const token = await getToken(appCheck);
-
-  // Verify the token here or pass it to the backend for verification
-  console.log('reCAPTCHA Token for login:', token);
+  // Get reCAPTCHA token
+  const captchaToken = await getRecaptchaToken();
+  if (!captchaToken) {
+    displayMessage("login-error-message", "reCAPTCHA verification failed.");
+    return;
+  }
 
   try {
     const userDoc = await getDoc(doc(db, "users", username));
