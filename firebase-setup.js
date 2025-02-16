@@ -1,6 +1,6 @@
 // Import Firebase libraries
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app-check.js";
+import { initializeAppCheck, ReCaptchaV3Provider, getToken } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app-check.js";
 import {
   getFirestore,
   collection,
@@ -12,9 +12,7 @@ import {
   doc,
   getDoc
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-import {
-  getAuth
-} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -34,6 +32,13 @@ const app = initializeApp(firebaseConfig);
 const appCheck = initializeAppCheck(app, {
   provider: new ReCaptchaV3Provider('6LdBNdkqAAAAAIh8NW8oqzlKemtRTOeV-To_Y9g8'),
   isTokenAutoRefreshEnabled: true
+});
+
+// Force a token refresh on load to ensure fresh tokens
+getToken(appCheck, true).then(tokenResult => {
+  console.log('Fresh App Check token obtained:', tokenResult.token);
+}).catch(err => {
+  console.error('Error obtaining App Check token:', err);
 });
 
 // Initialize Firestore and Auth
