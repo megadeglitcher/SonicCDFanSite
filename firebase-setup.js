@@ -93,6 +93,13 @@ export async function registerUser(username, password) {
     displayMessage("register-error-message", "Username cannot be empty or just whitespace!");
     return;
   }
+
+  // Get reCAPTCHA token for registration action
+  const token = await getToken(appCheck);
+  
+  // Verify the token here or pass it to the backend for verification
+  console.log('reCAPTCHA Token for registration:', token);
+
   try {
     const userDoc = await getDoc(doc(db, "users", username));
     if (userDoc.exists()) {
@@ -122,6 +129,13 @@ export async function loginUser(username, password) {
     displayMessage("login-error-message", "Username cannot be empty or just whitespace!");
     return;
   }
+
+  // Get reCAPTCHA token for login action
+  const token = await getToken(appCheck);
+
+  // Verify the token here or pass it to the backend for verification
+  console.log('reCAPTCHA Token for login:', token);
+
   try {
     const userDoc = await getDoc(doc(db, "users", username));
     if (!userDoc.exists()) {
@@ -143,12 +157,6 @@ export async function loginUser(username, password) {
     displayMessage("login-error-message", "Error logging in.");
   }
 }
-window.registerUser = registerUser;
-window.loginUser = loginUser;
-
-// Determine comments collection based on current page name
-const currentPage = window.location.pathname.split("/").pop().split(".")[0];
-const commentsCollectionName = `comments-${currentPage}`;
 
 // Submit a comment (requires the user to be logged in)
 export async function submitComment() {
@@ -161,9 +169,16 @@ export async function submitComment() {
     alert("Comment cannot be blank!");
     return;
   }
+
+  // Get reCAPTCHA token for comment submission
+  const token = await getToken(appCheck);
+
+  // Verify the token here or pass it to the backend for verification
+  console.log('reCAPTCHA Token for comment submission:', token);
+
   const createdAt = new Date().toISOString();
   try {
-    await addDoc(collection(db, commentsCollectionName), {
+    await addDoc(collection(db, `comments-${currentPage}`), {
       name: loggedInUser,
       comment,
       createdAt
@@ -173,7 +188,6 @@ export async function submitComment() {
     console.error("Error adding comment:", e);
   }
 }
-window.submitComment = submitComment;
 
 // Log off the user
 window.logOff = function() {
@@ -186,7 +200,7 @@ window.logOff = function() {
 
 // Load comments from Firestore and update the UI live
 export function loadComments() {
-  const commentsRef = collection(db, commentsCollectionName);
+  const commentsRef = collection(db, `comments-${currentPage}`);
   const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
   onSnapshot(commentsQuery, (snapshot) => {
     const commentsContainer = document.getElementById("comments-container");
@@ -198,19 +212,7 @@ export function loadComments() {
       const commentText = document.createElement("p");
       const commentTimestamp = document.createElement("p");
 
-      // Apply special effects for user "SDG"
-      if (commentData.name === "SDG") {
-        commentText.appendChild(rainbowText(`${commentData.name}: `, true));
-        const commentParts = commentData.comment.split("\n").map((part) => rainbowText(part));
-        commentParts.forEach((part) => {
-          commentText.appendChild(part);
-          commentText.appendChild(document.createElement("br"));
-        });
-        applyOutlineStyle(commentText);
-      } else {
-        commentText.textContent = `${commentData.name}: ${commentData.comment}`;
-      }
-
+      commentText.textContent = `${commentData.name}: ${commentData.comment}`;
       commentTimestamp.textContent = new Date(commentData.createdAt).toLocaleString();
       commentTimestamp.style.fontSize = "small";
       commentTimestamp.style.fontStyle = "italic";
