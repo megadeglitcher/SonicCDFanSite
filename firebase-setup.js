@@ -71,6 +71,7 @@ function eraseCookie(name) {
 
 function displayMessage(elementId, message, isError = true) {
   const element = document.getElementById(elementId);
+  if (!element) return; // Prevent errors if element not found
   element.textContent = message;
   element.style.color = isError ? "red" : "green";
   setTimeout(() => {
@@ -189,6 +190,7 @@ export function loadComments() {
   const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
   onSnapshot(commentsQuery, (snapshot) => {
     const commentsContainer = document.getElementById("comments-container");
+    if (!commentsContainer) return;
     commentsContainer.innerHTML = "";
     snapshot.forEach((doc) => {
       const commentData = doc.data();
@@ -283,26 +285,28 @@ window.onload = function() {
 
   // Contact form handling
   const contactForm = document.getElementById("contact-form");
-  contactForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const name = document.getElementById("contact-username").value;
-    const email = document.getElementById("contact-email").value;
-    const subject = document.getElementById("contact-subject").value;
-    const message = document.getElementById("contact-message").value;
-    try {
-      await addDoc(collection(db, "contactMessages"), {
-        name,
-        email,
-        subject,
-        message,
-        createdAt: new Date().toISOString()
-      });
-      document.getElementById("contact-status-message").textContent = "Message sent successfully!";
-      document.getElementById("contact-status-message").style.color = "green";
-      contactForm.reset();
-    } catch (error) {
-      document.getElementById("contact-status-message").textContent = "Error sending message.";
-      document.getElementById("contact-status-message").style.color = "red";
-    }
-  });
+  if (contactForm) {
+    contactForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("contact-username").value;
+      const email = document.getElementById("contact-email").value;
+      const subject = document.getElementById("contact-subject").value;
+      const message = document.getElementById("contact-message").value;
+      try {
+        await addDoc(collection(db, "contactMessages"), {
+          name,
+          email,
+          subject,
+          message,
+          createdAt: new Date().toISOString()
+        });
+        document.getElementById("contact-status-message").textContent = "Message sent successfully!";
+        document.getElementById("contact-status-message").style.color = "green";
+        contactForm.reset();
+      } catch (error) {
+        document.getElementById("contact-status-message").textContent = "Error sending message.";
+        document.getElementById("contact-status-message").style.color = "red";
+      }
+    });
+  }
 };
