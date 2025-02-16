@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lomment & Contact Us</title>
+  <title>Romment & Contact Us</title>
   <style>
     /* Basic styling */
     body {
@@ -25,10 +25,22 @@
     button {
       padding: 8px 16px;
     }
+
+    /* Visual elements for reCAPTCHA v3 interaction */
+    #loading-message {
+      display: none;
+      color: #f39c12;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      padding: 20px;
+    }
   </style>
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <script src="https://www.google.com/recaptcha/api.js?render=6LdBNdkqAAAAAIh8NW8oqzlKemtRTOeV-To_Y9g8"></script>
 </head>
 <body>
+  <div id="loading-message">Please wait, verifying...</div>
+  
   <!-- Login/Register Section -->
   <div id="login-section">
     <h1>Login/Register</h1>
@@ -48,34 +60,9 @@
     </div>
   </div>
 
-  <!-- Comment Section -->
-  <div id="comment-section" style="display: none;">
-    <h1>Comment Section</h1>
-    <div>
-      <textarea id="comment" placeholder="Write your comment here"></textarea>
-      <button onclick="submitComment()">Submit</button>
-    </div>
-    <button onclick="logOff()">Log Off</button>
-    <div>
-      <h2>Change Password</h2>
-      <input type="text" id="change-username" placeholder="Username" />
-      <input type="password" id="current-password" placeholder="Current Password" />
-      <input type="password" id="new-password" placeholder="New Password" />
-      <button onclick="changePassword(
-            document.getElementById('change-username').value,
-            document.getElementById('current-password').value,
-            document.getElementById('new-password').value
-          )">Change Password</button>
-      <p id="change-password-error-message" style="color: red;"></p>
-    </div>
-    <div id="comments-container">
-      <!-- Comments will load here -->
-    </div>
-  </div>
-
   <!-- Contact Us Form -->
   <h1>Contact Us</h1>
-  <form id="contact-form">
+  <form id="contact-form" onsubmit="event.preventDefault(); handleFormSubmit();">
     <input type="text" id="contact-username" placeholder="Your Name" required />
     <input type="email" id="contact-email" placeholder="Your Email" required />
     <input type="text" id="contact-subject" placeholder="Subject" required />
@@ -84,12 +71,33 @@
   </form>
   <p id="contact-status-message"></p>
 
-  <!-- Load our Firebase/App Check code -->
-  <script type="module" src="firebase-setup.js"></script>
-    <form action="your_form_submission_url">
-        <div class="g-recaptcha" data-sitekey="6LdBNdkqAAAAAIh8NW8oqzlKemtRTOeV-To_Y9g8"></div>
-        <br/>
-        <button type="submit">Submit</button>
-    </form>
+  <!-- Handle form submission with reCAPTCHA v3 -->
+  <script>
+    function handleFormSubmit() {
+      // Show the loading message to indicate that the verification is in progress
+      document.getElementById('loading-message').style.display = 'block';
+
+      // Execute reCAPTCHA v3
+      grecaptcha.execute('6LdBNdkqAAAAAIh8NW8oqzlKemtRTOeV-To_Y9g8', { action: 'submit' }).then(function(token) {
+        // Add token to the form
+        const form = document.getElementById('contact-form');
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'g-recaptcha-response';
+        hiddenInput.value = token;
+        form.appendChild(hiddenInput);
+
+        // Submit the form (you can change this to your server-side submission logic)
+        form.submit();
+
+        // Hide loading message after submission
+        document.getElementById('loading-message').style.display = 'none';
+      }).catch(function(error) {
+        // If there's an error, hide the loading message
+        document.getElementById('loading-message').style.display = 'none';
+        alert('There was an error with reCAPTCHA. Please try again.');
+      });
+    }
+  </script>
 </body>
 </html>
