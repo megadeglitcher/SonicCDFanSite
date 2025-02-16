@@ -1,290 +1,151 @@
-// Import the necessary Firebase functions
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-
-// Your Firebase configuration
+// Firebase Configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCrxSA-Y5FjKCkULoQ3iwCiKaupZOSK9FU",
-  authDomain: "soniccdfansite.firebaseapp.com",
-  projectId: "soniccdfansite",
-  storageBucket: "soniccdfansite.firebasestorage.app",
-  messagingSenderId: "739250141699",
-  appId: "1:739250141699:web:1925788f3944b1aa58ac36",
-  measurementId: "G-EQK0WQWQ33"
+    apiKey: "AIzaSyCrxSA-Y5FjKCkULoQ3iwCiKaupZOSK9FU",
+    authDomain: "soniccdfansite.firebaseapp.com",
+    projectId: "soniccdfansite",
+    storageBucket: "soniccdfansite.firebasestorage.app",
+    messagingSenderId: "739250141699",
+    appId: "1:739250141699:web:1925788f3944b1aa58ac36",
+    measurementId: "G-EQK0WQWQ33"
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-// Utility function to manage cookies (get, set, and check)
+// Utility functions for cookies
 function setCookie(name, value, days) {
-  const date = new Date();
-  date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-  const expires = "expires=" + date.toUTCString();
-  document.cookie = name + "=" + value + ";" + expires + ";path=/";
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
 }
 
 function getCookie(name) {
-  const nameEQ = name + "=";
-  const ca = document.cookie.split(';');
-  for (let i = 0; i < ca.length; i++) {
-    let c = ca[i].trim();
-    if (c.indexOf(nameEQ) === 0) {
-      return c.substring(nameEQ.length, c.length);
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for (let c of ca) {
+        c = c.trim();
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length);
     }
-  }
-  return null;
+    return null;
 }
 
 function eraseCookie(name) {
-  document.cookie = name + '=; Max-Age=-99999999;';
+    document.cookie = name + '=; Max-Age=-99999999;';
 }
 
-// Check if the user is logged in by checking cookies
+// Display messages
+function displayMessage(elementId, message, isError = true) {
+    const element = document.getElementById(elementId);
+    element.textContent = message;
+    element.style.color = isError ? 'red' : 'green';
+    setTimeout(() => element.textContent = '', 5000);
+}
+
+// User Authentication
 let loggedInUser = getCookie("loggedInUser");
 
-function displayMessage(elementId, message, isError = true) {
-  const element = document.getElementById(elementId);
-  element.textContent = message;
-  element.style.color = isError ? 'red' : 'green';
-  setTimeout(() => {
-    element.textContent = '';
-  }, 5000);
-}
+async function registerUser() {
+    const username = document.getElementById("register-username").value.trim();
+    const password = document.getElementById("register-password").value;
 
-async function registerUser(username, password) {
-  username = username.trim();
-  if (/\s/.test(username)) {
-  displayMessage('register-error-message', 'Username cannot contain spaces!');
-  return;
-}
-  if (!username) {
-    displayMessage('register-error-message', 'Username cannot be empty or just whitespace!');
-    return;
-  }
-
-  try {
-    const userDoc = await getDoc(doc(db, "users", username));
-    if (userDoc.exists()) {
-      displayMessage('register-error-message', 'Username already in use!');
-      return;
+    if (!username || /\s/.test(username)) {
+        displayMessage("register-error-message", "Invalid username.");
+        return;
     }
-    const createdAt = new Date().toISOString(); // Get the current date and time
-    await setDoc(doc(db, "users", username), { 
-      username, 
-      password,
-      createdAt  // Store user creation date
+
+    const userDoc = await db.collection("users").doc(username).get();
+    if (userDoc.exists) {
+        displayMessage("register-error-message", "Username already exists!");
+        return;
+    }
+
+    await db.collection("users").doc(username).set({ username, password });
+    displayMessage("register-error-message", "User registered successfully!", false);
+}
+
+async function loginUser() {
+    const username = document.getElementById("login-username").value.trim();
+    const password = document.getElementById("login-password").value;
+
+    const userDoc = await db.collection("users").doc(username).get();
+    if (!userDoc.exists || userDoc.data().password !== password) {
+        displayMessage("login-error-message", "Invalid username or password.");
+        return;
+    }
+
+    loggedInUser = username;
+    setCookie("loggedInUser", username, 1993);
+    displayMessage("login-error-message", "Logged in successfully!", false);
+    loadComments();
+}
+
+function logOff() {
+    eraseCookie("loggedInUser");
+    loggedInUser = null;
+    displayMessage("login-error-message", "Logged out successfully.", false);
+}
+
+// Contact Form Submission
+document.getElementById("contactForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const username = document.getElementById("contact-username").value.trim();
+    const email = document.getElementById("contact-email").value.trim();
+    const subject = document.getElementById("contact-subject").value.trim();
+    const message = document.getElementById("contact-message").value.trim();
+
+    if (!username || !email || !subject || !message) {
+        displayMessage("contact-response", "All fields are required!", true);
+        return;
+    }
+
+    await db.collection("contact_messages").add({
+        username, email, subject, message,
+        createdAt: new Date().toISOString()
     });
-    displayMessage('register-error-message', 'User registered successfully!', false);
-  } catch (e) {
-    displayMessage('register-error-message', 'Error registering user.');
-  }
-}
 
-async function loginUser(username, password) {
-  username = username.trim();
-  if (/\s/.test(username)) {
-	displayMessage('login-error-message', 'Username cannot contain spaces!');
-	return;
-	}
-  if (!username) {
-    displayMessage('login-error-message', 'Username cannot be empty or just whitespace!');
-    return;
-  }
+    document.getElementById("contactForm").reset();
+    displayMessage("contact-response", "Your message has been sent!", false);
+});
 
-  try {
-    const userDoc = await getDoc(doc(db, "users", username));
-    if (!userDoc.exists()) {
-      displayMessage('login-error-message', 'Username does not exist!');
-      return;
-    }
-    const userData = userDoc.data();
-    if (userData.password === password) {
-      loggedInUser = username;
-      setCookie("loggedInUser", username, 1993);  // Set cookie for 1993 days only during login
-      displayMessage('login-error-message', 'User logged in successfully!', false);
-      loadComments();  // Load comments after login
-    } else {
-      displayMessage('login-error-message', 'Incorrect password!');
-    }
-  } catch (e) {
-    displayMessage('login-error-message', 'Error logging in.');
-  }
-}
-
-window.registerUser = registerUser;
-window.loginUser = loginUser;
-
-// Extract the current HTML filename without extension
-const currentPage = window.location.pathname.split('/').pop().split('.')[0];
-
-// Determine the Firebase collection name based on the current page
-const commentsCollectionName = `comments-${currentPage}`;
-
-window.submitComment = async function() {
-  if (!loggedInUser) {
-    alert('You need to be logged in to do that.');
-    return;
-  }
-  const comment = document.getElementById('comment').value.trim();
-  if (!comment) {
-    alert('Comment cannot be blank!');
-    return;
-  }
-
-  const createdAt = new Date().toISOString(); // Store in UTC
-
-  try {
-    await addDoc(collection(db, commentsCollectionName), {
-      name: loggedInUser,
-      comment,
-      createdAt
-    });
-    document.getElementById('comment').value = '';
-    loadComments(); // Reload comments after submission
-  } catch (e) {
-    console.error("Error adding comment:", e);
-  }
-};
-
-// Add this function to handle the log off functionality
-window.logOff = function() {
-  eraseCookie("loggedInUser"); // Clear the cookie
-  loggedInUser = null; // Reset logged-in user in JavaScript
-
-  displayMessage('login-error-message', 'You have been logged out.', false);
-
-  // Reload the comments to show the state after logging out
-  loadComments();
-
-  // Optionally, update the UI to show login buttons and hide comment form
-  document.getElementById('comment-section').style.display = 'none';
-  document.getElementById('login-section').style.display = 'block';
-};
-
+// Comments Section
 function loadComments() {
-  const commentsRef = collection(db, commentsCollectionName);
-  const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
-  onSnapshot(commentsQuery, (snapshot) => {
-    const commentsContainer = document.getElementById('comments-container');
-    commentsContainer.innerHTML = ''; // Clear previous comments
-    snapshot.forEach((doc) => {
-      const commentData = doc.data();
-      const commentElement = document.createElement('div');
-      const commentText = document.createElement('p');
-      const commentTimestamp = document.createElement('p');
-	  
-      // Check if the comment is from the user "SDG"
-      if (commentData.name === "SDG") {
-        // Apply reverse rainbow effect on username
-        commentText.appendChild(rainbowText(`${commentData.name}: `, true));
-        
-        // Apply rainbow effect to the comment text
-        const commentParts = commentData.comment.split('\n').map(part => rainbowText(part));
-        commentParts.forEach(part => {
-          commentText.appendChild(part);
-          commentText.appendChild(document.createElement('br'));
+    db.collection("comments").orderBy("createdAt", "desc").onSnapshot(snapshot => {
+        const commentsContainer = document.getElementById("comments-container");
+        commentsContainer.innerHTML = "";
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const commentElement = document.createElement("div");
+            commentElement.innerHTML = `<strong>${data.name}:</strong> ${data.comment}`;
+            commentsContainer.appendChild(commentElement);
         });
-        // Apply outline effect to SDG comment text
-        applyOutlineStyle(commentText); // Add black outline
-      } else {
-        // Regular style for other users
-		commentText.textContent = `${commentData.name}: ${commentData.comment}`;
-      }
-
-      commentTimestamp.textContent = new Date(commentData.createdAt).toLocaleString();
-      commentTimestamp.style.fontSize = 'small';
-      commentTimestamp.style.fontStyle = 'italic';
-      commentTimestamp.style.color = 'rgba(0, 0, 0, 0.6)';
-      commentTimestamp.style.marginTop = '-10px';
-
-      // Append elements to the comment container
-      commentElement.appendChild(commentText);
-      commentElement.appendChild(commentTimestamp);
-      commentsContainer.appendChild(commentElement);
     });
-  });
 }
 
-function rainbowText(text, reverse = false) {
-  const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
-  if (reverse) colors.reverse();
-  const span = document.createElement('span');
-  for (let i = 0; i < text.length; i++) {
-    const charSpan = document.createElement('span');
-    charSpan.style.color = colors[i % colors.length];
-    charSpan.textContent = text[i];
-    span.appendChild(charSpan);
-  }
-  return span;
-}
-// Change password function
-window.changePassword = async function(username, currentPassword, newPassword) {
-  username = username.trim();
-  currentPassword = currentPassword.trim();
-  newPassword = newPassword.trim();
-  if (!username || !currentPassword || !newPassword) {
-    alert('All fields are required.');
-    return;
-  }
-  try {
-    const userDoc = await getDoc(doc(db, "users", username));
-    if (!userDoc.exists()) {
-      alert('Username does not exist!');
-      return;
+async function submitComment() {
+    if (!loggedInUser) {
+        alert("You need to be logged in to comment.");
+        return;
     }
-    const userData = userDoc.data();
-    if (userData.password !== currentPassword) {
-      alert('Current password is incorrect!');
-      return;
+
+    const comment = document.getElementById("comment").value.trim();
+    if (!comment) {
+        alert("Comment cannot be blank!");
+        return;
     }
-    // Update password without overwriting other user data
-    await setDoc(doc(db, "users", username), { ...userData, password: newPassword }, { merge: true });
-    alert('Password changed successfully!');
-  } catch (e) {
-    alert('Error changing password.');
-  }
-};
-function applyOutlineStyle(element) {
-  // Apply webkit text stroke (real outline effect)
-  element.style.webkitTextStroke = '0.5px black'; // Black outline
-  element.style.textFillColor = 'white'; // Text color
+
+    await db.collection("comments").add({
+        name: loggedInUser,
+        comment,
+        createdAt: new Date().toISOString()
+    });
+
+    document.getElementById("comment").value = "";
+    loadComments();
 }
 
-
-// Load comments dynamically based on the current page's collection
-window.onload = function() {
-  loadComments(); // Load comments on page load
-  
-  if (loggedInUser !== "SDG") {
-    const detectDevTools = () => {
-      const threshold = 160; // Height/Width of the console when open
-      const isDevToolsOpen = () => {
-        return (
-          window.outerWidth - window.innerWidth > threshold ||
-          window.outerHeight - window.innerHeight > threshold
-        );
-      };
-
-      let devToolsOpened = isDevToolsOpen();
-
-      if (devToolsOpened) {
-        window.close(); // Attempt to close the window
-        setTimeout(() => {
-          window.location.href = "about:blank"; // Fallback by navigating to an empty page
-        }, 500); // Ensure window.close is triggered
-      }
-    };
-
-    // Use requestAnimationFrame to check every frame
-    const checkDevTools = () => {
-      detectDevTools(); // Check on every frame
-      requestAnimationFrame(checkDevTools); // Recurse on next frame
-    };
-
-    // Start checking for dev tools on the first frame
-    requestAnimationFrame(checkDevTools);
-  }
+// Load comments on page load
+window.onload = function () {
+    loadComments();
 };
