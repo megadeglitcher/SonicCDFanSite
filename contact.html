@@ -1,49 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
-    <script defer src="script.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login/Register, Comment & Contact Us</title>
+  <script type="module" src="firebase-setup.js"></script>
 </head>
 <body>
+  <h1>Login/Register</h1>
+  
+  <div>
+    <h2>Register</h2>
+    <input type="text" id="register-username" placeholder="Username">
+    <input type="password" id="register-password" placeholder="Password">
+    <button onclick="registerUser(document.getElementById('register-username').value, document.getElementById('register-password').value)">Register</button>
+    <p id="register-error-message" style="color: red;"></p>
+  </div>
+  
+  <div>
+    <h2>Login</h2>
+    <input type="text" id="login-username" placeholder="Username">
+    <input type="password" id="login-password" placeholder="Password">
+    <button onclick="loginUser(document.getElementById('login-username').value, document.getElementById('login-password').value)">Login</button>
+    <p id="login-error-message" style="color: red;"></p>
+  </div>
 
-    <h2>User Authentication</h2>
-    <div id="login-section">
-        <input type="text" id="login-username" placeholder="Username" required>
-        <input type="password" id="login-password" placeholder="Password" required>
-        <button onclick="loginUser()">Login</button>
-        <p id="login-error-message"></p>
-    </div>
+  <h1>Comment Section</h1>
+  <div>
+    <textarea id="comment" placeholder="Write your comment here"></textarea>
+    <button onclick="submitComment()">Submit</button>
+  </div>
+  <button onclick="logOff()">Log Off</button>
+  
+  <div>
+    <h2>Change Password</h2>
+    <input type="text" id="change-username" placeholder="Username">
+    <input type="password" id="current-password" placeholder="Current Password">
+    <input type="password" id="new-password" placeholder="New Password">
+    <button onclick="changePassword(document.getElementById('change-username').value, document.getElementById('current-password').value, document.getElementById('new-password').value)">Change Password</button>
+    <p id="change-password-error-message" style="color: red;"></p>
+  </div>
 
-    <h3>Register</h3>
-    <div id="register-section">
-        <input type="text" id="register-username" placeholder="New Username" required>
-        <input type="password" id="register-password" placeholder="New Password" required>
-        <button onclick="registerUser()">Register</button>
-        <p id="register-error-message"></p>
-    </div>
+  <div id="comments-container">
+    <!-- Comments will be loaded here -->
+  </div>
 
-    <button onclick="logOff()">Log Off</button>
-
-    <h2>Contact Us</h2>
-    <form id="contactForm">
-        <input type="text" id="contact-username" placeholder="Your Name" required><br>
-        <input type="email" id="contact-email" placeholder="Your Email" required><br>
-        <input type="text" id="contact-subject" placeholder="Subject" required><br>
-        <textarea id="contact-message" placeholder="Your Message" required></textarea><br>
-        <button type="submit">Send Message</button>
-    </form>
-    <p id="contact-response"></p>
-
-    <h2>Comments Section</h2>
-    <div id="comment-section">
-        <textarea id="comment" placeholder="Write a comment..."></textarea>
-        <button onclick="submitComment()">Post Comment</button>
-    </div>
-    <div id="comments-container"></div>
+  <h1>Contact Us</h1>
+  <form id="contact-form">
+    <input type="text" id="contact-username" placeholder="Your Name" required>
+    <input type="email" id="contact-email" placeholder="Your Email" required>
+    <input type="text" id="contact-subject" placeholder="Subject" required>
+    <textarea id="contact-message" placeholder="Your Message" required></textarea>
+    <button type="submit">Send Message</button>
+  </form>
+  <p id="contact-status-message"></p>
 
 </body>
 </html>
