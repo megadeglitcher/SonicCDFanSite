@@ -1,14 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test reCAPTCHA</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lomment & Contact Us</title>
+  <style>
+    /* Basic styling */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #login-section, #comment-section {
+      margin: 20px 0;
+      padding: 20px;
+      border: 1px solid #ccc;
+    }
+    input, textarea {
+      display: block;
+      margin: 10px 0;
+      width: 100%;
+      max-width: 400px;
+      padding: 8px;
+    }
+    button {
+      padding: 8px 16px;
+    }
+  </style>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
+  <!-- Login/Register Section -->
+  <div id="login-section">
+    <h1>Login/Register</h1>
+    <div>
+      <h2>Register</h2>
+      <input type="text" id="register-username" placeholder="Username" />
+      <input type="password" id="register-password" placeholder="Password" />
+      <button onclick="registerUser(document.getElementById('register-username').value, document.getElementById('register-password').value)">Register</button>
+      <p id="register-error-message" style="color: red;"></p>
+    </div>
+    <div>
+      <h2>Login</h2>
+      <input type="text" id="login-username" placeholder="Username" />
+      <input type="password" id="login-password" placeholder="Password" />
+      <button onclick="loginUser(document.getElementById('login-username').value, document.getElementById('login-password').value)">Login</button>
+      <p id="login-error-message" style="color: red;"></p>
+    </div>
+  </div>
+
+  <!-- Comment Section -->
+  <div id="comment-section" style="display: none;">
+    <h1>Comment Section</h1>
+    <div>
+      <textarea id="comment" placeholder="Write your comment here"></textarea>
+      <button onclick="submitComment()">Submit</button>
+    </div>
+    <button onclick="logOff()">Log Off</button>
+    <div>
+      <h2>Change Password</h2>
+      <input type="text" id="change-username" placeholder="Username" />
+      <input type="password" id="current-password" placeholder="Current Password" />
+      <input type="password" id="new-password" placeholder="New Password" />
+      <button onclick="changePassword(
+            document.getElementById('change-username').value,
+            document.getElementById('current-password').value,
+            document.getElementById('new-password').value
+          )">Change Password</button>
+      <p id="change-password-error-message" style="color: red;"></p>
+    </div>
+    <div id="comments-container">
+      <!-- Comments will load here -->
+    </div>
+  </div>
+
+  <!-- Contact Us Form -->
+  <h1>Contact Us</h1>
+  <form id="contact-form">
+    <input type="text" id="contact-username" placeholder="Your Name" required />
+    <input type="email" id="contact-email" placeholder="Your Email" required />
+    <input type="text" id="contact-subject" placeholder="Subject" required />
+    <textarea id="contact-message" placeholder="Your Message" required></textarea>
+    <button type="submit">Send Message</button>
+  </form>
+  <p id="contact-status-message"></p>
+
+  <!-- Load our Firebase/App Check code -->
+  <script type="module" src="firebase-setup.js"></script>
     <form action="your_form_submission_url">
-        <div class="g-recaptcha" data-sitekey="your-site-key-here"></div>
+        <div class="g-recaptcha" data-sitekey="6LdBNdkqAAAAAIh8NW8oqzlKemtRTOeV-To_Y9g8"></div>
         <br/>
         <button type="submit">Submit</button>
     </form>
