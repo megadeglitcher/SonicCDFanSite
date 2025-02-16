@@ -1,5 +1,6 @@
-// Import the necessary Firebase functions
+// Import Firebase libraries
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app-check.js";
 import {
   getFirestore,
   collection,
@@ -12,13 +13,10 @@ import {
   getDoc
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut
+  getAuth
 } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-// Your Firebase configuration
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCrxSA-Y5FjKCkULoQ3iwCiKaupZOSK9FU",
   authDomain: "soniccdfansite.firebaseapp.com",
@@ -31,9 +29,18 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
-// Utility functions for cookie management
+// Initialize App Check with reCAPTCHA v3 (invisible)
+const appCheck = initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider('6LdBNdkqAAAAAIh8NW8oqzlKemtRTOeV-To_Y9g8'),
+  isTokenAutoRefreshEnabled: true
+});
+
+// Initialize Firestore and Auth
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+// Utility functions for cookies and messages
 function setCookie(name, value, days) {
   const date = new Date();
   date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -57,10 +64,6 @@ function eraseCookie(name) {
   document.cookie = name + "=; Max-Age=-99999999;";
 }
 
-// Check if the user is logged in by checking cookies
-let loggedInUser = getCookie("loggedInUser");
-
-// Utility function to display messages
 function displayMessage(elementId, message, isError = true) {
   const element = document.getElementById(elementId);
   element.textContent = message;
@@ -70,7 +73,10 @@ function displayMessage(elementId, message, isError = true) {
   }, 5000);
 }
 
-// Register a new user (stored in Firestore under "users")
+// Retrieve logged in user from cookies (if any)
+let loggedInUser = getCookie("loggedInUser");
+
+// Register a new user (stored in Firestore "users" collection)
 export async function registerUser(username, password) {
   username = username.trim();
   if (/\s/.test(username)) {
@@ -81,7 +87,6 @@ export async function registerUser(username, password) {
     displayMessage("register-error-message", "Username cannot be empty or just whitespace!");
     return;
   }
-
   try {
     const userDoc = await getDoc(doc(db, "users", username));
     if (userDoc.exists()) {
@@ -100,7 +105,7 @@ export async function registerUser(username, password) {
   }
 }
 
-// Login an existing user by comparing the provided password
+// Login an existing user
 export async function loginUser(username, password) {
   username = username.trim();
   if (/\s/.test(username)) {
@@ -111,7 +116,6 @@ export async function loginUser(username, password) {
     displayMessage("login-error-message", "Username cannot be empty or just whitespace!");
     return;
   }
-
   try {
     const userDoc = await getDoc(doc(db, "users", username));
     if (!userDoc.exists()) {
@@ -121,12 +125,11 @@ export async function loginUser(username, password) {
     const userData = userDoc.data();
     if (userData.password === password) {
       loggedInUser = username;
-      setCookie("loggedInUser", username, 1993); // Set cookie for 1993 days
+      setCookie("loggedInUser", username, 1993);
       displayMessage("login-error-message", "User logged in successfully!", false);
-      // Hide the login section and show the comment section
       document.getElementById("login-section").style.display = "none";
       document.getElementById("comment-section").style.display = "block";
-      loadComments(); // Load comments after login
+      loadComments();
     } else {
       displayMessage("login-error-message", "Incorrect password!");
     }
@@ -134,11 +137,10 @@ export async function loginUser(username, password) {
     displayMessage("login-error-message", "Error logging in.");
   }
 }
-
 window.registerUser = registerUser;
 window.loginUser = loginUser;
 
-// Determine the current page name (used to create a unique comments collection)
+// Determine comments collection based on current page name
 const currentPage = window.location.pathname.split("/").pop().split(".")[0];
 const commentsCollectionName = `comments-${currentPage}`;
 
@@ -153,9 +155,7 @@ export async function submitComment() {
     alert("Comment cannot be blank!");
     return;
   }
-
   const createdAt = new Date().toISOString();
-
   try {
     await addDoc(collection(db, commentsCollectionName), {
       name: loggedInUser,
@@ -163,16 +163,14 @@ export async function submitComment() {
       createdAt
     });
     document.getElementById("comment").value = "";
-    // Comments will auto-update via onSnapshot
   } catch (e) {
     console.error("Error adding comment:", e);
   }
 }
-
 window.submitComment = submitComment;
 
-// Log off the current user: erase cookie and toggle sections
-window.logOff = function () {
+// Log off the user
+window.logOff = function() {
   eraseCookie("loggedInUser");
   loggedInUser = null;
   displayMessage("login-error-message", "You have been logged out.", false);
@@ -180,20 +178,20 @@ window.logOff = function () {
   document.getElementById("comment-section").style.display = "none";
 };
 
-// Load comments from Firestore and update the comments container live
+// Load comments from Firestore and update the UI live
 export function loadComments() {
   const commentsRef = collection(db, commentsCollectionName);
   const commentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
   onSnapshot(commentsQuery, (snapshot) => {
     const commentsContainer = document.getElementById("comments-container");
-    commentsContainer.innerHTML = ""; // Clear previous comments
+    commentsContainer.innerHTML = "";
     snapshot.forEach((doc) => {
       const commentData = doc.data();
       const commentElement = document.createElement("div");
       const commentText = document.createElement("p");
       const commentTimestamp = document.createElement("p");
 
-      // For a special user "SDG", apply rainbow and outline effects
+      // Apply special effects for user "SDG"
       if (commentData.name === "SDG") {
         commentText.appendChild(rainbowText(`${commentData.name}: `, true));
         const commentParts = commentData.comment.split("\n").map((part) => rainbowText(part));
@@ -205,6 +203,7 @@ export function loadComments() {
       } else {
         commentText.textContent = `${commentData.name}: ${commentData.comment}`;
       }
+
       commentTimestamp.textContent = new Date(commentData.createdAt).toLocaleString();
       commentTimestamp.style.fontSize = "small";
       commentTimestamp.style.fontStyle = "italic";
@@ -217,10 +216,9 @@ export function loadComments() {
     });
   });
 }
-
 window.loadComments = loadComments;
 
-// Rainbow text effect: splits text into characters and cycles through colors
+// Utility: Rainbow text effect (for "SDG")
 function rainbowText(text, reverse = false) {
   const colors = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"];
   if (reverse) colors.reverse();
@@ -234,14 +232,14 @@ function rainbowText(text, reverse = false) {
   return span;
 }
 
-// Apply an outline style (using webkit text stroke)
+// Utility: Outline style for "SDG" comments
 function applyOutlineStyle(element) {
   element.style.webkitTextStroke = "0.5px black";
   element.style.color = "white";
 }
 
-// Change password functionality: verifies current password and updates it
-window.changePassword = async function (username, currentPassword, newPassword) {
+// Change password function
+window.changePassword = async function(username, currentPassword, newPassword) {
   username = username.trim();
   currentPassword = currentPassword.trim();
   newPassword = newPassword.trim();
@@ -267,11 +265,9 @@ window.changePassword = async function (username, currentPassword, newPassword) 
   }
 };
 
-window.onload = function () {
-  // Load comments (even if not logged in, you may see past comments)
+// Window onload: Initialize sections and contact form handling
+window.onload = function() {
   loadComments();
-
-  // Set section visibility based on whether a user is logged in
   if (loggedInUser) {
     document.getElementById("login-section").style.display = "none";
     document.getElementById("comment-section").style.display = "block";
@@ -280,34 +276,7 @@ window.onload = function () {
     document.getElementById("comment-section").style.display = "none";
   }
 
-  // If the logged-in user is not "SDG", detect and react to developer tools opening
-  if (loggedInUser !== "SDG") {
-    const detectDevTools = () => {
-      const threshold = 160;
-      const isDevToolsOpen = () => {
-        return (
-          window.outerWidth - window.innerWidth > threshold ||
-          window.outerHeight - window.innerHeight > threshold
-        );
-      };
-
-      if (isDevToolsOpen()) {
-        window.close();
-        setTimeout(() => {
-          window.location.href = "about:blank";
-        }, 500);
-      }
-    };
-
-    const checkDevTools = () => {
-      detectDevTools();
-      requestAnimationFrame(checkDevTools);
-    };
-
-    requestAnimationFrame(checkDevTools);
-  }
-
-  // Contact form handling: submit the data to a Firestore collection "contactMessages"
+  // Contact form handling
   const contactForm = document.getElementById("contact-form");
   contactForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -315,7 +284,6 @@ window.onload = function () {
     const email = document.getElementById("contact-email").value;
     const subject = document.getElementById("contact-subject").value;
     const message = document.getElementById("contact-message").value;
-    
     try {
       await addDoc(collection(db, "contactMessages"), {
         name,
