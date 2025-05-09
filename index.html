@@ -68,8 +68,11 @@
         console.log("test");
     }
 	document.addEventListener("mousedown", (event) => {
-		var button = document.getElementById("button")
-		var sound = new Audio("./sounds/mouseclick.mp3");
+		var sound = new Audio("./sounds/MouseClick.wav");
+		sound.play();
+	});
+	document.addEventListener("mouseup", (event) => {
+		var sound = new Audio("./sounds/MouseRelease.wav");
 		sound.play();
 	});
 </script>
